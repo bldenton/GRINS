@@ -45,7 +45,7 @@ namespace GRINS
   class ConservativeNavierStokes : public Physics
   {
   public:
-    ConservativeNavierStokes(const PhyscisName& physics_name,
+    ConservativeNavierStokes(const PhysicsName& physics_name,
                              const std::string& core_physics_name,
                              const GetPot& input);
     
@@ -85,7 +85,7 @@ namespace GRINS
     
     // Mass Matrix Part(s)
     virtual void mass_residual( bool compute_jacobian,
-                                AssemblyContesxt & context );
+                                AssemblyContext & context );
     
     virtual void compute_postprocessed_quantity( unsigned int quantity_index,
                                                  const AssemblyContext& context,
@@ -105,9 +105,9 @@ namespace GRINS
     
   protected:
     // Solution Variables
-    DensityFEVariable& _density_var
-    ConservativeMomentumVariable& _momentum_vars
-    ConservativeEnergyFEVariable& _conserv_energy_var
+    DensityFEVariable& _density_var;
+    ConservativeMomentumVariable& _momentum_vars;
+    ConservativeEnergyFEVariable& _conserv_energy_var;
   
     // Viscosity Object
     Viscosity _mu;
@@ -119,7 +119,7 @@ namespace GRINS
     ThermalConductivity _k;
     
     // Ratio of Specific Heat
-    libMesh::Real _gamma;
+    libMesh::Real _gamma, _R;
     
     // Gravity Vector
     libMesh::Point _g;

@@ -110,6 +110,19 @@ namespace GRINS
     {}
 
     ~ConservativeMomentumVariable(){}
+    
+    //! Number of components
+    //unsigned int dim() const
+    //{ return _vars.size(); }
+
+    VariableIndex rho_u() const
+    { return this->_vars[_u_idx]; }
+
+    VariableIndex rho_v() const
+    { return this->_vars[_v_idx]; }
+
+    VariableIndex rho_w() const
+    { return this->_vars[_w_idx]; }
   };
 
 } // end namespace GRINS

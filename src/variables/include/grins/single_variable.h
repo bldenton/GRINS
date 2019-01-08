@@ -168,7 +168,7 @@ namespace GRINS
     
     ~DensityFEVariable(){}
     
-    VariableIndex density() const
+    VariableIndex rho() const
     { return this->var();}
   
   private:
