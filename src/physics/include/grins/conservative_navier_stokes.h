@@ -19,7 +19,7 @@
 //
 //-----------------------------------------------------------------------el-
 
-#ifdef GRINS_CONSERVATIVE_NAVIER_STOKES_H
+#ifndef GRINS_CONSERVATIVE_NAVIER_STOKES_H
 #define GRINS_CONSERVATIVE_NAVIER_STOKES_H
 
 // GRINS
