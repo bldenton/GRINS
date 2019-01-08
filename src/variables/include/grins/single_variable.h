@@ -154,6 +154,48 @@ namespace GRINS
 
     ThermoPressureVariable();
   };
+  
+  // Implemented Density Single Variable for Conservative Navier-Stokes Formulation
+  // BLD 10-26-2018
+  class DensityFEVariable : public SingleVariable
+  {
+  public:
+    DensityFEVariable( const std::vector<std::string>& var_names,
+                       const std::vector<VariableIndex>& var_indices,
+                       const std::set<libMesh::subdomain_id_type>& subdomain_ids )
+      : SingleVariable(var_names, var_indices, subdomain_ids)
+    {}
+    
+    ~DensityFEVariable(){}
+    
+    VariableIndex density() const
+    { return this->var();}
+  
+  private:
+  
+    DensityFEVariable();
+  };  
+  
+  // Implemented Conservative Energy Single Variable for Conservative Navier-Stokes Formulation
+  // BLD 10-26-2018
+  class ConservativeEnergyFEVariable : public SingleVariable
+  {
+  public:
+    ConservativeEnergyFEVariable( const std::vector<std::string>& var_names,
+                       const std::vector<VariableIndex>& var_indices,
+                       const std::set<libMesh::subdomain_id_type>& subdomain_ids )
+      : SingleVariable(var_names, var_indices, subdomain_ids)
+    {}
+    
+    ~ConservativeEnergyFEVariable(){}
+    
+    VariableIndex conserv_energy() const
+    { return this->var();}
+  
+  private:
+  
+    ConservativeEnergyFEVariable();
+  }; 
 } // end namespace GRINS
 
 #endif // GRINS_SINGLE_VARIABLE_H

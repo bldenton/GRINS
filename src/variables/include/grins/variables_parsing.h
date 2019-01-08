@@ -63,6 +63,15 @@ namespace GRINS
 
     static std::string scalar_var_section()
     { return "ScalarVariable"; }
+    
+    static std::string density_section()
+    { return "Density"; }
+    
+    static std::string conserv_energy_section()
+    { return "ConservativeEnergy"; }
+    
+    static std::string conserv_momentum_section()
+    { return "ConservativeMomentum"; }
 
     //! Helper function to encapsualte the overall [Variables] section name.
     static std::string variables_section()
@@ -156,8 +165,33 @@ namespace GRINS
                                                       "species_mass_fracs_var_name",
                                                       VariablesParsing::species_mass_fractions_section(),
                                                       section_type); }
-
-
+    
+    // Density Variable                                                  
+    static std::string density_variable_name( const GetPot& input, const std::string& subsection_name,
+                                              const SECTION_TYPE section_type )
+    { return VariablesParsing::section_parse_var_name(input,
+                                                      subsection_name,
+                                                      "density_var_name",
+                                                      VariablesParsing::density_section(),
+                                                      section_type); }
+    
+    // Conservative Energy Variable                                                  
+    static std::string conserv_energy_variable_name( const GetPot& input, const std::string& subsection_name,
+                                                     const SECTION_TYPE section_type )
+    { return VariablesParsing::section_parse_var_name(input,
+                                                      subsection_name,
+                                                      "conserv_energy_var_name",
+                                                      VariablesParsing::conserv_energy_section(),
+                                                      section_type); }
+    
+    // Conservative Momentum Variable                                                  
+    static std::string conserv_momentum_variable_name( const GetPot& input, const std::string& subsection_name,
+                                               const SECTION_TYPE section_type )
+    { return VariablesParsing::section_parse_var_name(input,
+                                                      subsection_name,
+                                                      "conserv_momentum_var_name",
+                                                      VariablesParsing::velocity_section(),
+                                                      section_type); }
 
   private:
 

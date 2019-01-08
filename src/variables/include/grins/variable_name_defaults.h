@@ -47,7 +47,7 @@ namespace GRINS
   //! z-velocity
   const std::string w_var_name_default = "w";
 
-  //! z-velocity
+  //! viscosity
   const std::string nu_var_name_default = "nu";
 
   //! r-velocity (axisymmetric case)
@@ -89,7 +89,21 @@ namespace GRINS
   const std::string u_disp_name_default = "u";
   const std::string v_disp_name_default = "v";
   const std::string w_disp_name_default = "w";
+  
+  //! Density Field
+  const std::string density_var_name_default = "rho";
+  
+  //! Conservative Energy Field
+  const std::string conserv_energy_name_default = "conserv_energy";
 
+  //! Conservative X-Momentum
+  const std::string rho_u_var_name_default = "rho_u";
+
+  //! Conservative Y-Momentum
+  const std::string rho_v_var_name_default = "rho_v";
+
+  //! Conservative Z-Momentum
+  const std::string rho_w_var_name_default = "rho_w";
 }
 
 #endif //VARIABLE_NAME_DEFAULTS_H

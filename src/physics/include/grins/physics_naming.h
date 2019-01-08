@@ -62,6 +62,9 @@ namespace GRINS
     static PhysicsName stokes()
     { return "Stokes"+suffix(); }
 
+    static PhysicsName conservative_navier_stokes()
+    { return "ConservativeNavierStokes"+suffix(); }
+
     static PhysicsName incompressible_navier_stokes()
     { return "IncompressibleNavierStokes"+suffix(); }
 

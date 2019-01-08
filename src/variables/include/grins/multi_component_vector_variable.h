@@ -96,6 +96,21 @@ namespace GRINS
 
     ~VelocityVariable(){}
   };
+  
+  // Conservative Momentume Variable (density * velocity) Formulation
+  // Add 10/29/2019 :: BLD
+  class ConservativeMomentumVariable : public MultcomponentVectorVariable
+  {
+  public:
+
+    ConservativeMomentumVariable( const std::vector<std::string>& var_names,
+                      const std::vector<VariableIndex>& var_indices,
+                      const std::set<libMesh::subdomain_id_type>& subdomain_ids )
+      : MultcomponentVectorVariable(var_names,var_indices,subdomain_ids)
+    {}
+
+    ~ConservativeMomentumVariable(){}
+  };
 
 } // end namespace GRINS
 

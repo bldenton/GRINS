@@ -61,5 +61,14 @@ namespace GRINS
 
     static ScalarVariableFactory<ScalarVariable>
       grins_factory_scalar_var(VariablesParsing::scalar_var_section());
+      
+    static VariableFactoryBasic<DensityFEVariable>
+      grins_factory_density_fe_var(VariablesParsing::density_section());
+      
+    static VariableFactoryBasic<ConservativeEnergyFEVariable>
+      grins_factory_conserv_energy_fe_var(VariablesParsing::conserv_energy_section());
+      
+    static VariableFactoryBasic<ConservativeMomentumVariable>
+      grins_factory_conserv_momentum_fe_var(VariablesParsing::conserv_momentum_section());
   }
 } // end namespace GRINS

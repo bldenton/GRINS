@@ -146,6 +146,7 @@ libgrins_la_SOURCES += physics/src/physics_builder.C
 libgrins_la_SOURCES += physics/src/variable_pinning.C
 libgrins_la_SOURCES += physics/src/physics_factory_initializer.C
 libgrins_la_SOURCES += physics/src/overlapping_fluid_solid_map.C
+libgrins_la_SOURCES += physics/src/conservative_navier_stokes.C
 
 # src/properties files
 libgrins_la_SOURCES += properties/src/constant_conductivity.C
@@ -282,6 +283,7 @@ sfiles_DATA += properties/src/antioch_kinetics.C
 sfiles_DATA += properties/src/antioch_mixture_averaged_transport_mixture.C
 sfiles_DATA += properties/src/antioch_mixture_averaged_transport_evaluator.C
 sfiles_DATA += properties/src/antioch_constant_transport_mixture.C
+sfiles_DATA += physics/src/conservative_navier_stokes.C
 
 #----------------------------
 #INCLUDES we want distributed
@@ -450,6 +452,8 @@ include_HEADERS += physics/include/grins/physics_builder.h
 include_HEADERS += physics/include/grins/variable_pinning.h
 include_HEADERS += physics/include/grins/physics_factory_initializer.h
 include_HEADERS += physics/include/grins/overlapping_fluid_solid_map.h
+include_HEADERS += physics/include/grins/conservative_navier_stokes.h
+include_HEADERS += physics/include/grins/physics_factory_conservative_flow.h
 
 # src/properties headers
 include_HEADERS += properties/include/grins/property_types.h
