@@ -31,8 +31,8 @@
 
 // libMesh
 #include "libmesh/enum_order.h"
-#include "libmesh_enum_fe_family.h"
-#include "libmesh.point.h"
+#include "libmesh/enum_fe_family.h"
+#include "libmesh/point.h"
 
 namespace GRINS
 {
