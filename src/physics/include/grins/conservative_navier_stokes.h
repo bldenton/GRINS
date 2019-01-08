@@ -27,7 +27,7 @@
 #include "grins/assembly_context.h"
 #include "grins/grins_enums.h"
 #include "grins/single_variable.h"
-#include "grins_multi_component_vector_variable.h"
+#include "grins/multi_component_vector_variable.h"
 
 // libMesh
 #include "libmesh/enum_order.h"
