@@ -317,25 +317,25 @@ namespace GRINS
           /* ---  perform integration  --- */
           for (unsigned int ii = 0; ii != n_rho_dofs; ++ii)
             {
-              Frho(ii) -= this -> JxW_density * rho_phi[ii][qp] * rho_dot;
+              Frho(ii) -= this -> JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
               
               // Need to add Mrho_rho calculations here
             }  // end density quadrature loop
           
           for (unsigned int ii = 0; ii != n_rho_u_dofs; ++ii)
             {
-              Frho_u(ii) -= this -> JxW_momentum * momentum_phi[ii][qp] * rho_u_dot;
-              Frho_v(ii) -= this -> JxW_momentum * momentum_phi[ii][qp] * rho_v_dot;
+              Frho_u(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_u_dot;
+              Frho_v(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_v_dot;
               
               if ( this -> _momentum_vars.dim() == 3)
-              (*Frho_w)(ii) -= this -> JxW_momentum * momentum_phi[ii][qp] * rho_w_dot;
+              (*Frho_w)(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
               
               // Need to add Mrho_u_rho_u, etc calculations here
             }  // end momentum quadrature loop
             
           for (unsigned int ii = 0; ii != n_conserv_energy_dofs; ++ii)
             {
-              Fconserv_energy(ii) -= this -> JxW_energy * conserv_energy_phi[ii][qp] * energy_dot;
+              Fconserv_energy(ii) -= this -> JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
               
               // Need to add Menergy_energy calculations here
             }  // end conservative energy quadrature loop
