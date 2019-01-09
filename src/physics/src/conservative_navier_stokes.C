@@ -127,7 +127,7 @@ namespace GRINS
     
     // --- Auxiliary Inputs Initialization
     template<class Mu, class SH, class TC>
-    void ConservativeNavierStokes<Mu, Sh, TC>::auxiliary_init( MultiphysicsSystem& system )
+    void ConservativeNavierStokes<Mu, SH, TC>::auxiliary_init( MultiphysicsSystem& system )
     {
       // Add Auxiliary Input Initialization code here if necessary
     }
@@ -258,7 +258,7 @@ namespace GRINS
       
         /* ---   If 3D Domain, get Z-Momentum   --- */
       if (this -> _momentum_vars.dim() == 3)
-        libmesh_assert (n_rho_w_dofs == context.get_dof_indices(this->_momentum_vars.rho_w()).size());
+        libmesh_assert (n_rho_u_dofs == context.get_dof_indices(this->_momentum_vars.rho_w()).size());
         
         /* ---   Conservative Energy   --- */
       const unsigned int n_conserv_energy_dofs = context.get_dof_indices(this->_conserv_energy_var.conserv_energy()).size();      
@@ -268,7 +268,7 @@ namespace GRINS
       // -----------------------------------------------------
       libMesh::DenseSubVector<libMesh::Real> &Frho = context.get_elem_residual(this->_density_var.rho());            // R_(rho)
       libMesh::DenseSubVector<libMesh::Real> &Frho_u = context.get_elem_residual(this->_momentum_vars.rho_u());      // R_{rho_u}
-      libMesh::DenseSubVector<libMesh::Real> &Frho_v = context.get_elem_residual(This->_momentum_vars.rho_v());      // R_{row_v}
+      libMesh::DenseSubVector<libMesh::Real> &Frho_v = context.get_elem_residual(this->_momentum_vars.rho_v());      // R_{row_v}
       libMesh::DenseSubVector<libMesh::Real>* Frho_w = NULL;
       libMesh::DenseSubVector<libMesh::Real> &Fconserv_energy = context.get_elem_residual(this->_conserv_energy_var.conserv_energy());      // R_{conserv_energy}   
       
@@ -281,9 +281,9 @@ namespace GRINS
       libMesh::DenseSubMatrix<libMesh::Real>* Mrho_w_rho_w = NULL;     
       libMesh::DenseSubMatrix<libMesh::Real> &Menergy_energy = context.get_elem_jacobian(this->_conserv_energy_var.conserv_energy(), this->_conserv_energy_var.conserv_energy()); // R_{conserv_energy},{conserv_energy}         
       
-      if (this -> _momentum_vars.gim() == 3)
+      if (this -> _momentum_vars.dim() == 3)
         {
-          Frho_w = &context.get_elem_residual(This->_momentum_vars.rho_w());      // R_{row_w}
+          Frho_w = &context.get_elem_residual(this->_momentum_vars.rho_w());      // R_{row_w}
           Mrho_w_rho_w = &context.get_elem_jacobian(this->_momentum_vars.rho_w(), this->_momentum_vars.rho_w()); // R_{rho_w},{rho_w}
         }
       
@@ -428,7 +428,7 @@ namespace GRINS
             w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
           
             /* --- Gradients  --- */
-          libMesh::Gradient grad_x_momentum, grad_y_momentum, grad_z_momentum;
+          libMesh::Gradient grad_u_momentum, grad_v_momentum, grad_w_momentum;
           grad_u_momentum = context.interior_gradient(this->_momentum_vars.rho_u(), qp);    // grad(u_momentum)
           grad_v_momentum = context.interior_gradient(this->_momentum_vars.rho_v(), qp);    // grad(v_momentum)
           if (this->_momentum_vars.dim() == 3)
@@ -533,7 +533,7 @@ namespace GRINS
       // Define Residual Frho_u [ R_{rho_u} ]
       // -----------------------------------------------------
       libMesh::DenseSubVector<libMesh::Number> &Frho_u = context.get_elem_residual(this->_momentum_vars.rho_u());      // R_{rho_u}
-      libMesh::DenseSubVector<libMesh::Number> &Frho_v = context.get_elem_residual(This->_momentum_vars.rho_v());      // R_{row_v}
+      libMesh::DenseSubVector<libMesh::Number> &Frho_v = context.get_elem_residual(this->_momentum_vars.rho_v());      // R_{row_v}
       libMesh::DenseSubVector<libMesh::Number>* Frho_w = NULL;
       libMesh::DenseSubVector<libMesh::Number> &Fconserv_energy = context.get_elem_residual(this->_conserv_energy_var.conserv_energy());      // R_{conserv_energy}
       
@@ -647,12 +647,12 @@ namespace GRINS
             w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
             
             /* --- Conservative Energy Value at Quadrature Point --- */
-          conserv_energy = context.interior_value(this->_conserv_energy_var.conser_energy(), qp);
+          conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);
           
           // -----------------------------------------------------------
           // Compute the Solution Gradients at the Old Newton Iteration
           // -----------------------------------------------------------
-          libMesh::Gradient grad_density, grad_x_momentum, grad_y_momentum, grad_z_momentum, grad_conserv_energy;
+          libMesh::Gradient grad_density, grad_u_momentum, grad_v_momentum, grad_w_momentum, grad_conserv_energy;
           
             /* --- Density Gradietn at Quadrature Point --- */
           grad_density = context.interior_gradient(this->_density_var.rho(), qp);           // grad(density)
@@ -664,7 +664,7 @@ namespace GRINS
             grad_w_momentum = context.interior_gradient(this->_momentum_vars.rho_w(), qp);  // grad(w_momentum)
             
             /* --- Conservative Energy at Quadrature Point --- */
-          grad_conserv_energy = context.interior_gradient(this->_conerv_energy_var.conserv_energy(), qp);  // grad(conserv_energy)
+          grad_conserv_energy = context.interior_gradient(this->_conserv_energy_var.conserv_energy(), qp);  // grad(conserv_energy)
           
           // -------------------------------------------------------------------
           // Compute Viscoity and Thermal Conductivity at this Quadrature Point
@@ -769,14 +769,14 @@ namespace GRINS
           
           c11_vrow[0] = -_mu_qp*v_momentum/sqr_density;
           c11_vrow[1] = 0.;
-          c11_vrow[2] = mu_qp/density;
+          c11_vrow[2] = _mu_qp/density;
           c11_vrow[3] = 0.;
           c11_vrow[4] = 0.;
           
-          c11_wrow[0] = -mu_qp*w_momentum/sqr_density;
+          c11_wrow[0] = -_mu_qp*w_momentum/sqr_density;
           c11_wrow[1] = 0.;
           c11_wrow[2] = 0.;
-          c11_wrow[3] = mu_qp*density;
+          c11_wrow[3] = _mu_qp*density;
           c11_wrow[4] = 0.;
           
           c11_energyrow[0] = (u_momentum/density)*c11_urow[0] + (v_momentum/density)*c11_vrow[0] + (w_momentum/density)*c11_wrow[0] +
@@ -793,8 +793,8 @@ namespace GRINS
           c12_urow[3] = 0.;
           c12_urow[4] = 0.;
           
-          c12_vrow[0] = -mu_qp*u_momentum/sqr_density;
-          c12_vrow[1] = mu_qp/density;
+          c12_vrow[0] = -_mu_qp*u_momentum/sqr_density;
+          c12_vrow[1] = _mu_qp/density;
           c12_vrow[2] = 0.;
           c12_vrow[3] = 0.;
           c12_vrow[4] = 0.;
@@ -824,8 +824,8 @@ namespace GRINS
           c13_vrow[3] = 0.;
           c13_vrow[4] = 0.;
           
-          c13_wrow[0] = -mu_qp*u_momentum/sqr_density;
-          c13_wrow[1] = mu_qp/density;
+          c13_wrow[0] = -_mu_qp*u_momentum/sqr_density;
+          c13_wrow[1] = _mu_qp/density;
           c13_wrow[2] = 0.;
           c13_wrow[3] = 0.;
           c13_wrow[4] = 0.;
@@ -874,10 +874,10 @@ namespace GRINS
           c22_vrow[3] = 0.;
           c22_vrow[4] = 0.;
           
-          c22_wrow[0] = -mu_qp*w_momentum/sqr_density;
+          c22_wrow[0] = -_mu_qp*w_momentum/sqr_density;
           c22_wrow[1] = 0.;
           c22_wrow[2] = 0.;
-          c22_wrow[3] = mu_qp/density;
+          c22_wrow[3] = _mu_qp/density;
           c22_wrow[4] = 0.;
           
           c22_energyrow[0] = (u_momentum/density)*c22_urow[0] + (v_momentum/density)*c22_vrow[0] + (w_momentum/density)*c22_wrow[0] +
@@ -900,9 +900,9 @@ namespace GRINS
           c23_vrow[3] = lambda/density;
           c23_vrow[4] = 0.;
           
-          c23_wrow[0] = -mu_qp*v_momentum/sqr_density;
+          c23_wrow[0] = -_mu_qp*v_momentum/sqr_density;
           c23_wrow[1] = 0.;
-          c23_wrow[2] = mu_qp/density;
+          c23_wrow[2] = _mu_qp/density;
           c23_wrow[3] = 0.;
           c23_wrow[4] = 0.;
           
@@ -1016,7 +1016,7 @@ namespace GRINS
           for (unsigned int ii=0; ii != n_rho_u_dofs; ii++)
             {
               // F{rho_u}
-              Frho_u(ii) -= JxW[qp] * 
+              Frho_u(ii) -= JxW_momentum[qp] * 
                     (momentum_phi[ii][qp] * (a1_urow*dUdx + a2_urow*dUdy + a3_urow*dUdz) +            // inviscid & inviscid-viscid interaction portions
                     momentum_gradphi[ii][qp](0) * (c11_urow*dUdx + c12_urow*dUdy + c13_urow*dUdz) +
                     momentum_gradphi[ii][qp](1) * (c21_urow*dUdx + c22_urow*dUdy + c23_urow*dUdz) +
@@ -1024,7 +1024,7 @@ namespace GRINS
                     );
               
               // F{rho_v}     
-              Frho_v(ii) -= JxW[qp] * 
+              Frho_v(ii) -= JxW_momentum[qp] * 
                     (momentum_phi[ii][qp] * (a1_vrow*dUdx + a2_vrow*dUdy + a3_vrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
                     momentum_gradphi[ii][qp](0) * (c11_vrow*dUdx + c12_vrow*dUdy + c13_vrow*dUdz) +
                     momentum_gradphi[ii][qp](1) * (c21_vrow*dUdx + c22_vrow*dUdy + c23_vrow*dUdz) +
@@ -1034,7 +1034,7 @@ namespace GRINS
               if (this->_momentum_vars.dim() == 3)
                 {
                   // F{rho_w}
-                  (*Frho_w)(ii) -= JxW[qp] *
+                  (*Frho_w)(ii) -= JxW_momentum[qp] *
                       (momentum_phi[ii][qp] * (a1_wrow*dUdx + a2_wrow*dUdy + a3_wrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
                       momentum_gradphi[ii][qp](0) * (c11_wrow*dUdx + c12_wrow*dUdy + c13_wrow*dUdz) +
                       momentum_gradphi[ii][qp](1) * (c21_wrow*dUdx + c22_wrow*dUdy + c23_wrow*dUdz) +
@@ -1171,7 +1171,7 @@ namespace GRINS
           for (unsigned int ii=0; ii != n_conserv_energy_dofs; ii++)
             {
               // F{conserv_energy}
-              Fconserv_energy(ii) -= JxW[qp] * 
+              Fconserv_energy(ii) -= JxW_energy[qp] * 
                     (conserv_energy_phi[ii][qp] * (a1_energyrow*dUdx + a2_energyrow*dUdy + a3_energyrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
                     conserv_energy_gradphi[ii][qp](0) * (c11_energyrow*dUdx + c12_energyrow*dUdy + c13_energyrow*dUdz) +
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow*dUdx + c22_energyrow*dUdy + c23_energyrow*dUdz) +
