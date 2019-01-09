@@ -183,10 +183,10 @@ namespace GRINS
       context.get_element_fe(_density_var.rho())->get_xyz();    // Location in Physical Space
       
       // Conservative Energy
-      context.get_element_fe(_conserv_energy_var.conserv_energy()->get_JxW();     // Jacobian time Weight Function
-      context.get_element_fe(_conserv_energy_var.conserv_energy()->get_phi();     // Test Function
-      context.get_element_fe(_conserv_energy_var.conserv_energy()->get_dphi();    // Gradient of Test Function
-      context.get_element_fe(_conserv_energy_var.conserv_energy()->get_xyz();     // Location in Physical Space
+      context.get_element_fe(_conserv_energy_var.conserv_energy())->get_JxW();     // Jacobian time Weight Function
+      context.get_element_fe(_conserv_energy_var.conserv_energy())->get_phi();     // Test Function
+      context.get_element_fe(_conserv_energy_var.conserv_energy())->get_dphi();    // Gradient of Test Function
+      context.get_element_fe(_conserv_energy_var.conserv_energy())->get_xyz();     // Location in Physical Space
       
       // Conservative Momentum :: Code Assumes these are the same for all momentum directions
       context.get_element_fe(_momentum_vars.rho_u())->get_JxW();      // Jacobian times Weighting Function
@@ -407,7 +407,7 @@ namespace GRINS
       
         /* ---   If 3D Domain, get Z-Momentum   --- */
       if (this -> _momentum_vars.dim() == 3)
-        libmesh_assert (n_rho_w_dofs == context.get_dof_indices(this->_momentum_vars.rho_w()).size());
+        libmesh_assert (n_rho_u_dofs == context.get_dof_indices(this->_momentum_vars.rho_w()).size());
         
         /* ---   Conservative Energy   --- */
       const unsigned int n_conserv_energy_dofs = context.get_dof_indices(this->_conserv_energy_var.conserv_energy()).size();
@@ -608,8 +608,8 @@ namespace GRINS
       // ---------------------------------------------------------------------------------------------------------
       // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
       // ---------------------------------------------------------------------------------------------------------
-      libMesh::DenseVector<libMesh::Number>::DenseVector<5, 0.> dUdx, dUdy, dUdz, dWdx, dWdy, dWdz;                     // Initialize to 0.
-      libMesh::DenseVector<libMesh::Number>::DenseVector<5, 0.> a1_urow, a1_vrow, a1_wrow, a1_energyrow,                // Initialize to 0.
+      libMesh::DenseVector<libMesh::Number>::DenseVector(5, 0.) dUdx, dUdy, dUdz, dWdx, dWdy, dWdz;                     // Initialize to 0.
+      libMesh::DenseVector<libMesh::Number>::DenseVector(5, 0.) a1_urow, a1_vrow, a1_wrow, a1_energyrow,                // Initialize to 0.
                                                                 a2_urow, a2_vrow, a2_wrow, a2_energyrow,
                                                                 a3_urow, a3_vrow, a3_wrow, a3_energyrow,
                                                                 c11_urow, c11_vrow, c11_wrow, c11_energyrow,
@@ -621,7 +621,7 @@ namespace GRINS
                                                                 c31_urow, c31_vrow, c31_wrow, c31_energyrow,
                                                                 c32_urow, c32_vrow, c32_wrow, c32_energyrow,
                                                                 c33_urow, c33_vrow, c33_wrow, c33_energyrow;
-      libMesh::DenseVector<libMesh::Number>::DenseVector<5, 0.> d_dx_rho, d_dx_umomentum, d_dx_vmomentum, d_dx_wmomentum, d_dx_conserv_energy,
+      libMesh::DenseVector<libMesh::Number>::DenseVector(5, 0.) d_dx_rho, d_dx_umomentum, d_dx_vmomentum, d_dx_wmomentum, d_dx_conserv_energy,
                                                                 d_dy_rho, d_dy_umomentum, d_dy_vmomentum, d_dy_wmomentum, d_dy_conserv_energy,
                                                                 d_dz_rho, d_dz_umomentum, d_dz_vmomentum, d_dz_wmomentum, d_dz_conserv_energy;
       
