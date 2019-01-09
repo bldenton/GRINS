@@ -225,9 +225,9 @@ namespace GRINS
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
-      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW;
-      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW;
-      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW;
+      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
 
       // --------------------------------------------------------------------
       // Get Shape Functions at interior quadrature points for each variable
@@ -350,7 +350,7 @@ namespace GRINS
                                                                               AssemblyContext & context)
     {
       // Element Jacobian * Quadrature weights for interior integration.
-      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW;
+      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
       
       // Get Shape Functions at interior quadrature points for each variable
         /* --- Density   --- */
@@ -495,8 +495,8 @@ namespace GRINS
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
-      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW;
-      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW;
+      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
       
       // --------------------------------------------------------------------
       // Get Shape Functions at interior quadrature points for each variable
