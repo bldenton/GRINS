@@ -50,6 +50,7 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/utility.h"
+#include "libmesh/dense_vector.h"
 
 namespace GRINS
 {
@@ -1175,7 +1176,7 @@ namespace GRINS
                     (conserv_energy_phi[ii][qp] * (a1_energyrow*dUdx + a2_energyrow*dUdy + a3_energyrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
                     conserv_energy_gradphi[ii][qp](0) * (c11_energyrow*dUdx + c12_energyrow*dUdy + c13_energyrow*dUdz) +
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow*dUdx + c22_energyrow*dUdy + c23_energyrow*dUdz) +
-                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow*dUdx + c32_energyrow*dUdy + c33_enerygrow*dUdz)
+                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow*dUdx + c32_energyrow*dUdy + c33_energyrow*dUdz)
                     );            
             }  // End of ii for energy degree of freedom
         }    // End of Quadrature Point For Loop            
