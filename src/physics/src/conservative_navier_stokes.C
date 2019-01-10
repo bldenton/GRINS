@@ -687,328 +687,328 @@ namespace GRINS
                    
             /* --- calculate a1 matrix  --- */
           a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
-          a1_urow[1] = (3. - _gamma_qp) * u_momentum/density;
-          a1_urow[2] = (1. - _gamma_qp) * v_momentum/density;
-          a1_urow[3] = (1. - _gamma_qp) * w_momentum/density;
-          a1_urow[4] = (_gamma_qp - 1.);
+          a1_urow(1) = (3. - _gamma_qp) * u_momentum/density;
+          a1_urow(2) = (1. - _gamma_qp) * v_momentum/density;
+          a1_urow(3) = (1. - _gamma_qp) * w_momentum/density;
+          a1_urow(4) = (_gamma_qp - 1.);
           
-          a1_vrow[0] = -u_momentum * v_momentum / sqr_density;
-          a1_vrow[1] = v_momentum / density;
-          a1_vrow[2] = u_momentum / density;
-          a1_vrow[3] = 0.;
-          a1_vrow[4] = 0.;
+          a1_vrow(0) = -u_momentum * v_momentum / sqr_density;
+          a1_vrow(1) = v_momentum / density;
+          a1_vrow(2) = u_momentum / density;
+          a1_vrow(3) = 0.;
+          a1_vrow(4) = 0.;
           
-          a1_wrow[0] = -u_momentum * w_momentum / sqr_density;
-          a1_wrow[1] = w_momentum / density;
-          a1_wrow[2] = 0.;
-          a1_wrow[3] = u_momentum / density;
-          a1_wrow[4] = 0.;
+          a1_wrow(0) = -u_momentum * w_momentum / sqr_density;
+          a1_wrow(1) = w_momentum / density;
+          a1_wrow(2) = 0.;
+          a1_wrow(3) = u_momentum / density;
+          a1_wrow(4) = 0.;
           
-          a1_energyrow[0] = (-_gamma_qp*conserv_energy*u_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*u_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
-          a1_energyrow[1] = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(3.*sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
-          a1_energyrow[2] = (1.-_gamma_qp)*u_momentum*v_momentum/sqr_density;
-          a1_energyrow[3] = (1.-_gamma_qp)*u_momentum*w_momentum/sqr_density;
-          a1_energyrow[4] = _gamma_qp*u_momentum/density;
+          a1_energyrow(0) = (-_gamma_qp*conserv_energy*u_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*u_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a1_energyrow(1) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(3.*sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a1_energyrow(2) = (1.-_gamma_qp)*u_momentum*v_momentum/sqr_density;
+          a1_energyrow(3) = (1.-_gamma_qp)*u_momentum*w_momentum/sqr_density;
+          a1_energyrow(4) = _gamma_qp*u_momentum/density;
           
             /* --- calculate a2 matrix  --- */
-          a2_urow[0] = -u_momentum * v_momentum / sqr_density;
-          a2_urow[1] = v_momentum / density;
-          a2_urow[2] = u_momentum / density;
-          a2_urow[3] = 0.;
-          a2_urow[4] = 0.;
+          a2_urow(0) = -u_momentum * v_momentum / sqr_density;
+          a2_urow(1) = v_momentum / density;
+          a2_urow(2) = u_momentum / density;
+          a2_urow(3) = 0.;
+          a2_urow(4) = 0.;
           
-          a2_vrow[0] = (_gamma_qp - 3.) * sqr_v_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_w_momentum);
-          a2_vrow[1] = (1. - _gamma_qp) * u_momentum / density;
-          a2_vrow[2] = (3. - _gamma_qp) * v_momentum / density;
-          a2_vrow[3] = (1. - _gamma_qp) * w_momentum / density;
-          a2_vrow[4] = (_gamma_qp - 1.);
+          a2_vrow(0) = (_gamma_qp - 3.) * sqr_v_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_w_momentum);
+          a2_vrow(1) = (1. - _gamma_qp) * u_momentum / density;
+          a2_vrow(2) = (3. - _gamma_qp) * v_momentum / density;
+          a2_vrow(3) = (1. - _gamma_qp) * w_momentum / density;
+          a2_vrow(4) = (_gamma_qp - 1.);
           
-          a2_wrow[0] = -v_momentum * w_momentum / sqr_density;
-          a2_wrow[1] = 0.;
-          a2_wrow[2] = w_momentum / density;
-          a2_wrow[3] = v_momentum / density;
-          a2_wrow[4] = 0.;
+          a2_wrow(0) = -v_momentum * w_momentum / sqr_density;
+          a2_wrow(1) = 0.;
+          a2_wrow(2) = w_momentum / density;
+          a2_wrow(3) = v_momentum / density;
+          a2_wrow(4) = 0.;
           
-          a2_energyrow[0] = (-_gamma_qp*conserv_energy*v_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*v_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
-          a2_energyrow[1] = a1_energyrow[2];
-          a2_energyrow[2] = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + 3.*sqr_v_momentum + sqr_w_momentum);
-          a2_energyrow[3] = (1.-_gamma_qp)*v_momentum*w_momentum/sqr_density;
-          a2_energyrow[4] = _gamma_qp*v_momentum/density;
+          a2_energyrow(0) = (-_gamma_qp*conserv_energy*v_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*v_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a2_energyrow(1) = a1_energyrow(2);
+          a2_energyrow(2) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + 3.*sqr_v_momentum + sqr_w_momentum);
+          a2_energyrow(3) = (1.-_gamma_qp)*v_momentum*w_momentum/sqr_density;
+          a2_energyrow(4) = _gamma_qp*v_momentum/density;
           
             /* ---  calculate a3 matrix  --- */
-          a3_urow[0] = -u_momentum * w_momentum / sqr_density;
-          a3_urow[1] = w_momentum / density;
-          a3_urow[2] = 0.;
-          a3_urow[3] = u_momentum / density;
-          a3_urow[4] = 0.;
+          a3_urow(0) = -u_momentum * w_momentum / sqr_density;
+          a3_urow(1) = w_momentum / density;
+          a3_urow(2) = 0.;
+          a3_urow(3) = u_momentum / density;
+          a3_urow(4) = 0.;
           
-          a3_vrow[0] = -v_momentum * w_momentum / sqr_density;
-          a3_vrow[1] = 0.;
-          a3_vrow[2] = w_momentum / density;
-          a3_vrow[3] = v_momentum / density;
-          a3_vrow[4] = 0.;
+          a3_vrow(0) = -v_momentum * w_momentum / sqr_density;
+          a3_vrow(1) = 0.;
+          a3_vrow(2) = w_momentum / density;
+          a3_vrow(3) = v_momentum / density;
+          a3_vrow(4) = 0.;
           
-          a3_wrow[0] = (_gamma_qp - 3.) * sqr_w_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_v_momentum);
-          a3_wrow[1] = (1. - _gamma_qp) * u_momentum / density;
-          a3_wrow[2] = (1. - _gamma_qp) * v_momentum / density;
-          a3_wrow[3] = (3. - _gamma_qp) * w_momentum / density;
-          a3_wrow[4] = (_gamma_qp - 1.); 
+          a3_wrow(0) = (_gamma_qp - 3.) * sqr_w_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_v_momentum);
+          a3_wrow(1) = (1. - _gamma_qp) * u_momentum / density;
+          a3_wrow(2) = (1. - _gamma_qp) * v_momentum / density;
+          a3_wrow(3) = (3. - _gamma_qp) * w_momentum / density;
+          a3_wrow(4) = (_gamma_qp - 1.); 
           
-          a3_energyrow[0] = (-_gamma_qp*conserv_energy*w_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*w_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
-          a3_energyrow[1] = a1_energyrow[3];
-          a3_energyrow[2] = a2_energyrow[3];
-          a3_energyrow[3] = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + sqr_v_momentum + 3.*sqr_w_momentum);
-          a3_energyrow[4] = _gamma_qp*w_momentum/density;
+          a3_energyrow(0) = (-_gamma_qp*conserv_energy*w_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*w_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a3_energyrow(1) = a1_energyrow(3);
+          a3_energyrow(2) = a2_energyrow(3);
+          a3_energyrow(3) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + sqr_v_momentum + 3.*sqr_w_momentum);
+          a3_energyrow(4) = _gamma_qp*w_momentum/density;
           
             /* --- calculate c11 matrix  --- */
-          c11_urow[0] = -mu_R*u_momentum/sqr_density;
-          c11_urow[1] = mu_R/density;
-          c11_urow[2] = 0.;
-          c11_urow[3] = 0.;
-          c11_urow[4] = 0.;
+          c11_urow(0) = -mu_R*u_momentum/sqr_density;
+          c11_urow(1) = mu_R/density;
+          c11_urow(2) = 0.;
+          c11_urow(3) = 0.;
+          c11_urow(4) = 0.;
           
-          c11_vrow[0] = -_mu_qp*v_momentum/sqr_density;
-          c11_vrow[1] = 0.;
-          c11_vrow[2] = _mu_qp/density;
-          c11_vrow[3] = 0.;
-          c11_vrow[4] = 0.;
+          c11_vrow(0) = -_mu_qp*v_momentum/sqr_density;
+          c11_vrow(1) = 0.;
+          c11_vrow(2) = _mu_qp/density;
+          c11_vrow(3) = 0.;
+          c11_vrow(4) = 0.;
           
-          c11_wrow[0] = -_mu_qp*w_momentum/sqr_density;
-          c11_wrow[1] = 0.;
-          c11_wrow[2] = 0.;
-          c11_wrow[3] = _mu_qp*density;
-          c11_wrow[4] = 0.;
+          c11_wrow(0) = -_mu_qp*w_momentum/sqr_density;
+          c11_wrow(1) = 0.;
+          c11_wrow(2) = 0.;
+          c11_wrow(3) = _mu_qp*density;
+          c11_wrow(4) = 0.;
           
-          c11_energyrow[0] = (u_momentum/density)*c11_urow[0] + (v_momentum/density)*c11_vrow[0] + (w_momentum/density)*c11_wrow[0] +
+          c11_energyrow(0) = (u_momentum/density)*c11_urow(0) + (v_momentum/density)*c11_vrow(0) + (w_momentum/density)*c11_wrow(0) +
                              (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*(-conserv_energy + (1./density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          c11_energyrow[1] = (u_momentum/density)*c11_urow[1] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
-          c11_energyrow[2] = (v_momentum/density)*c11_vrow[2] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
-          c11_energyrow[3] = (w_momentum/density)*c11_wrow[3] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
-          c11_energyrow[4] = (_k_qp*_gamma_qp)/(density*_cp_qp);      
+          c11_energyrow(1) = (u_momentum/density)*c11_urow(1) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
+          c11_energyrow(2) = (v_momentum/density)*c11_vrow(2) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
+          c11_energyrow(3) = (w_momentum/density)*c11_wrow(3) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
+          c11_energyrow(4) = (_k_qp*_gamma_qp)/(density*_cp_qp);      
             
             /* --- calculate c12 matrix  --- */
-          c12_urow[0] = -lambda*v_momentum/sqr_density;
-          c12_urow[1] = 0.;
-          c12_urow[2] = lambda/density;
-          c12_urow[3] = 0.;
-          c12_urow[4] = 0.;
+          c12_urow(0) = -lambda*v_momentum/sqr_density;
+          c12_urow(1) = 0.;
+          c12_urow(2) = lambda/density;
+          c12_urow(3) = 0.;
+          c12_urow(4) = 0.;
           
-          c12_vrow[0] = -_mu_qp*u_momentum/sqr_density;
-          c12_vrow[1] = _mu_qp/density;
-          c12_vrow[2] = 0.;
-          c12_vrow[3] = 0.;
-          c12_vrow[4] = 0.;
+          c12_vrow(0) = -_mu_qp*u_momentum/sqr_density;
+          c12_vrow(1) = _mu_qp/density;
+          c12_vrow(2) = 0.;
+          c12_vrow(3) = 0.;
+          c12_vrow(4) = 0.;
           
-          c12_wrow[0] = 0.;
-          c12_wrow[1] = 0.;
-          c12_wrow[2] = 0.;
-          c12_wrow[3] = 0.;
-          c12_wrow[4] = 0.;
+          c12_wrow(0) = 0.;
+          c12_wrow(1) = 0.;
+          c12_wrow(2) = 0.;
+          c12_wrow(3) = 0.;
+          c12_wrow(4) = 0.;
           
-          c12_energyrow[0] = (u_momentum/density)*c12_urow[0] + (v_momentum/density)*c12_vrow[0];
-          c12_energyrow[1] = (v_momentum/density)*c12_vrow[1];
-          c12_energyrow[2] = (u_momentum/density)*c12_urow[2];
-          c12_energyrow[3] = 0.;
-          c12_energyrow[4] = 0.;
+          c12_energyrow(0) = (u_momentum/density)*c12_urow(0) + (v_momentum/density)*c12_vrow(0);
+          c12_energyrow(1) = (v_momentum/density)*c12_vrow(1);
+          c12_energyrow(2) = (u_momentum/density)*c12_urow(2);
+          c12_energyrow(3) = 0.;
+          c12_energyrow(4) = 0.;
                     
             /* --- calculate c13 matrix  --- */
-          c13_urow[0] = -lambda*w_momentum/sqr_density;
-          c13_urow[1] = 0.;
-          c13_urow[2] = 0.;
-          c13_urow[3] = lambda/density;
-          c13_urow[4] = 0.;
+          c13_urow(0) = -lambda*w_momentum/sqr_density;
+          c13_urow(1) = 0.;
+          c13_urow(2) = 0.;
+          c13_urow(3) = lambda/density;
+          c13_urow(4) = 0.;
           
-          c13_vrow[0] = 0.;
-          c13_vrow[1] = 0.;
-          c13_vrow[2] = 0.;
-          c13_vrow[3] = 0.;
-          c13_vrow[4] = 0.;
+          c13_vrow(0) = 0.;
+          c13_vrow(1) = 0.;
+          c13_vrow(2) = 0.;
+          c13_vrow(3) = 0.;
+          c13_vrow(4) = 0.;
           
-          c13_wrow[0] = -_mu_qp*u_momentum/sqr_density;
-          c13_wrow[1] = _mu_qp/density;
-          c13_wrow[2] = 0.;
-          c13_wrow[3] = 0.;
-          c13_wrow[4] = 0.;
+          c13_wrow(0) = -_mu_qp*u_momentum/sqr_density;
+          c13_wrow(1) = _mu_qp/density;
+          c13_wrow(2) = 0.;
+          c13_wrow(3) = 0.;
+          c13_wrow(4) = 0.;
           
-          c13_energyrow[0] = (u_momentum/density)*c13_urow[0] + (w_momentum/density)*c13_wrow[0];
-          c13_energyrow[1] = (w_momentum/density)*c13_wrow[1];
-          c13_energyrow[2] = 0.;
-          c13_energyrow[3] = (u_momentum/density)*c13_urow[3];
-          c13_energyrow[4] = 0.;          
+          c13_energyrow(0) = (u_momentum/density)*c13_urow(0) + (w_momentum/density)*c13_wrow(0);
+          c13_energyrow(1) = (w_momentum/density)*c13_wrow(1);
+          c13_energyrow(2) = 0.;
+          c13_energyrow(3) = (u_momentum/density)*c13_urow(3);
+          c13_energyrow(4) = 0.;          
             
             /* --- calculate c21 matrix  --- */ 
-          c21_urow[0] = c11_vrow[0];
-          c21_urow[1] = 0.;
-          c21_urow[2] = c11_vrow[2];
-          c21_urow[3] = 0.;
-          c21_urow[4] = 0.;
+          c21_urow(0) = c11_vrow(0);
+          c21_urow(1) = 0.;
+          c21_urow(2) = c11_vrow(2);
+          c21_urow(3) = 0.;
+          c21_urow(4) = 0.;
           
-          c21_vrow[0] = -lambda*u_momentum/sqr_density;
-          c21_vrow[1] = lambda/density;
-          c21_vrow[2] = 0.;
-          c21_vrow[3] = 0.;
-          c21_vrow[4] = 0.;
+          c21_vrow(0) = -lambda*u_momentum/sqr_density;
+          c21_vrow(1) = lambda/density;
+          c21_vrow(2) = 0.;
+          c21_vrow(3) = 0.;
+          c21_vrow(4) = 0.;
           
-          c21_wrow[0] = 0.;
-          c21_wrow[1] = 0.;
-          c21_wrow[2] = 0.;
-          c21_wrow[3] = 0.;
-          c21_wrow[4] = 0.;
+          c21_wrow(0) = 0.;
+          c21_wrow(1) = 0.;
+          c21_wrow(2) = 0.;
+          c21_wrow(3) = 0.;
+          c21_wrow(4) = 0.;
           
-          c21_energyrow[0] = (u_momentum/density)*c21_urow[0] + (v_momentum/density)*c21_vrow[0];
-          c21_energyrow[1] = (v_momentum/density)*c21_vrow[1];
-          c21_energyrow[2] = (u_momentum/density)*c21_urow[2];
-          c21_energyrow[3] = 0.;
-          c21_energyrow[4] = 0.;          
+          c21_energyrow(0) = (u_momentum/density)*c21_urow(0) + (v_momentum/density)*c21_vrow(0);
+          c21_energyrow(1) = (v_momentum/density)*c21_vrow(1);
+          c21_energyrow(2) = (u_momentum/density)*c21_urow(2);
+          c21_energyrow(3) = 0.;
+          c21_energyrow(4) = 0.;          
           
             /* --- calculate c22 matrix  --- */
-          c22_urow[0] = c12_vrow[0];
-          c22_urow[1] = c12_vrow[1];
-          c22_urow[2] = 0.;
-          c22_urow[3] = 0.;
-          c22_urow[4] = 0.;
+          c22_urow(0) = c12_vrow(0);
+          c22_urow(1) = c12_vrow(1);
+          c22_urow(2) = 0.;
+          c22_urow(3) = 0.;
+          c22_urow(4) = 0.;
           
-          c22_vrow[0] = -mu_R*v_momentum/sqr_density;
-          c22_vrow[1] = 0.;
-          c22_vrow[2] = mu_R/density;
-          c22_vrow[3] = 0.;
-          c22_vrow[4] = 0.;
+          c22_vrow(0) = -mu_R*v_momentum/sqr_density;
+          c22_vrow(1) = 0.;
+          c22_vrow(2) = mu_R/density;
+          c22_vrow(3) = 0.;
+          c22_vrow(4) = 0.;
           
-          c22_wrow[0] = -_mu_qp*w_momentum/sqr_density;
-          c22_wrow[1] = 0.;
-          c22_wrow[2] = 0.;
-          c22_wrow[3] = _mu_qp/density;
-          c22_wrow[4] = 0.;
+          c22_wrow(0) = -_mu_qp*w_momentum/sqr_density;
+          c22_wrow(1) = 0.;
+          c22_wrow(2) = 0.;
+          c22_wrow(3) = _mu_qp/density;
+          c22_wrow(4) = 0.;
           
-          c22_energyrow[0] = (u_momentum/density)*c22_urow[0] + (v_momentum/density)*c22_vrow[0] + (w_momentum/density)*c22_wrow[0] +
+          c22_energyrow(0) = (u_momentum/density)*c22_urow(0) + (v_momentum/density)*c22_vrow(0) + (w_momentum/density)*c22_wrow(0) +
                              (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*(-conserv_energy + (1./density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          c22_energyrow[1] = (u_momentum/density)*c22_urow[1] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
-          c22_energyrow[2] = (v_momentum/density)*c22_vrow[2] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
-          c22_energyrow[3] = (w_momentum/density)*c22_wrow[3] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
-          c22_energyrow[4] = (_k_qp*_gamma_qp)/(density*_cp_qp);          
+          c22_energyrow(1) = (u_momentum/density)*c22_urow(1) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
+          c22_energyrow(2) = (v_momentum/density)*c22_vrow(2) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
+          c22_energyrow(3) = (w_momentum/density)*c22_wrow(3) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
+          c22_energyrow(4) = (_k_qp*_gamma_qp)/(density*_cp_qp);          
             
             /* --- calculate c23 matrix  --- */
-          c23_urow[0] = 0.;
-          c23_urow[1] = 0.;
-          c23_urow[2] = 0.;
-          c23_urow[3] = 0.;
-          c23_urow[4] = 0.;
+          c23_urow(0) = 0.;
+          c23_urow(1) = 0.;
+          c23_urow(2) = 0.;
+          c23_urow(3) = 0.;
+          c23_urow(4) = 0.;
           
-          c23_vrow[0] = -lambda*w_momentum/sqr_density;
-          c23_vrow[1] = 0.;
-          c23_vrow[2] = 0.;
-          c23_vrow[3] = lambda/density;
-          c23_vrow[4] = 0.;
+          c23_vrow(0) = -lambda*w_momentum/sqr_density;
+          c23_vrow(1) = 0.;
+          c23_vrow(2) = 0.;
+          c23_vrow(3) = lambda/density;
+          c23_vrow(4) = 0.;
           
-          c23_wrow[0] = -_mu_qp*v_momentum/sqr_density;
-          c23_wrow[1] = 0.;
-          c23_wrow[2] = _mu_qp/density;
-          c23_wrow[3] = 0.;
-          c23_wrow[4] = 0.;
+          c23_wrow(0) = -_mu_qp*v_momentum/sqr_density;
+          c23_wrow(1) = 0.;
+          c23_wrow(2) = _mu_qp/density;
+          c23_wrow(3) = 0.;
+          c23_wrow(4) = 0.;
           
-          c23_energyrow[0] = (v_momentum/density)*c23_vrow[0] + (w_momentum/density)*c23_wrow[0];
-          c23_energyrow[1] = 0.;
-          c23_energyrow[2] = (w_momentum/density)*c23_wrow[2];
-          c23_energyrow[3] = (v_momentum/density)*c23_vrow[3];
-          c23_energyrow[4] = 0.;
+          c23_energyrow(0) = (v_momentum/density)*c23_vrow(0) + (w_momentum/density)*c23_wrow(0);
+          c23_energyrow(1) = 0.;
+          c23_energyrow(2) = (w_momentum/density)*c23_wrow(2);
+          c23_energyrow(3) = (v_momentum/density)*c23_vrow(3);
+          c23_energyrow(4) = 0.;
             
             /* --- calculate c31 matrix  --- */
-          c31_urow[0] = c11_wrow[0];
-          c31_urow[1] = 0.;
-          c31_urow[2] = 0.;
-          c31_urow[3] = c11_wrow[3];
-          c31_urow[4] = 0.;
+          c31_urow(0) = c11_wrow(0);
+          c31_urow(1) = 0.;
+          c31_urow(2) = 0.;
+          c31_urow(3) = c11_wrow(3);
+          c31_urow(4) = 0.;
           
-          c31_vrow[0] = 0.;
-          c31_vrow[1] = 0.;
-          c31_vrow[2] = 0.;
-          c31_vrow[3] = 0.;
-          c31_vrow[4] = 0.;
+          c31_vrow(0) = 0.;
+          c31_vrow(1) = 0.;
+          c31_vrow(2) = 0.;
+          c31_vrow(3) = 0.;
+          c31_vrow(4) = 0.;
           
-          c31_wrow[0] = -lambda*u_momentum/sqr_density;
-          c31_wrow[1] = lambda/density;
-          c31_wrow[2] = 0.;
-          c31_wrow[3] = 0.;
-          c31_wrow[4] = 0.;
+          c31_wrow(0) = -lambda*u_momentum/sqr_density;
+          c31_wrow(1) = lambda/density;
+          c31_wrow(2) = 0.;
+          c31_wrow(3) = 0.;
+          c31_wrow(4) = 0.;
           
-          c31_energyrow[0] = (u_momentum/density)*c31_urow[0] + (w_momentum/density)*c31_wrow[0];
-          c31_energyrow[1] = (w_momentum/density)*c31_wrow[1];
-          c31_energyrow[2] = 0.;
-          c31_energyrow[3] = (u_momentum/density)*c31_urow[3];
-          c31_energyrow[4] = 0.;
+          c31_energyrow(0) = (u_momentum/density)*c31_urow(0) + (w_momentum/density)*c31_wrow(0);
+          c31_energyrow(1) = (w_momentum/density)*c31_wrow(1);
+          c31_energyrow(2) = 0.;
+          c31_energyrow(3) = (u_momentum/density)*c31_urow(3);
+          c31_energyrow(4) = 0.;
             
             /* --- calculate c32 matrix  --- */
-          c32_urow[0] = 0.;
-          c32_urow[1] = 0.;
-          c32_urow[2] = 0.;
-          c32_urow[3] = 0.;
-          c32_urow[4] = 0.;
+          c32_urow(0) = 0.;
+          c32_urow(1) = 0.;
+          c32_urow(2) = 0.;
+          c32_urow(3) = 0.;
+          c32_urow(4) = 0.;
           
-          c32_vrow[0] = c22_wrow[0];
-          c32_vrow[1] = 0.;
-          c32_vrow[2] = 0.;
-          c32_vrow[3] = c22_wrow[3];
-          c32_vrow[4] = 0.;
+          c32_vrow(0) = c22_wrow(0);
+          c32_vrow(1) = 0.;
+          c32_vrow(2) = 0.;
+          c32_vrow(3) = c22_wrow(3);
+          c32_vrow(4) = 0.;
           
-          c32_wrow[0] = -lambda*v_momentum/sqr_density;
-          c32_wrow[1] = 0.;
-          c32_wrow[2] = lambda/density;
-          c32_wrow[3] = 0.;
-          c32_wrow[4] = 0.;
+          c32_wrow(0) = -lambda*v_momentum/sqr_density;
+          c32_wrow(1) = 0.;
+          c32_wrow(2) = lambda/density;
+          c32_wrow(3) = 0.;
+          c32_wrow(4) = 0.;
           
-          c32_energyrow[0] = (v_momentum/density)*c32_vrow[0] + (w_momentum/density)*c32_wrow[0];
-          c32_energyrow[1] = 0.;
-          c32_energyrow[2] = (w_momentum/density)*c32_wrow[2];
-          c32_energyrow[3] = (v_momentum/density)*c32_vrow[3];
-          c32_energyrow[4] = 0.;          
+          c32_energyrow(0) = (v_momentum/density)*c32_vrow(0) + (w_momentum/density)*c32_wrow(0);
+          c32_energyrow(1) = 0.;
+          c32_energyrow(2) = (w_momentum/density)*c32_wrow(2);
+          c32_energyrow(3) = (v_momentum/density)*c32_vrow(3);
+          c32_energyrow(4) = 0.;          
             
             /* --- calculate c33 matrix  --- */
-          c33_urow[0] = c13_wrow[0];
-          c33_urow[1] = c13_wrow[1];
-          c33_urow[2] = 0.;
-          c33_urow[3] = 0.;
-          c33_urow[4] = 0.;
+          c33_urow(0) = c13_wrow(0);
+          c33_urow(1) = c13_wrow(1);
+          c33_urow(2) = 0.;
+          c33_urow(3) = 0.;
+          c33_urow(4) = 0.;
           
-          c33_vrow[0] = c23_wrow[0];
-          c33_vrow[1] = 0.;
-          c33_vrow[2] = c23_wrow[2];
-          c33_vrow[3] = 0.;
-          c33_vrow[4] = 0.;
+          c33_vrow(0) = c23_wrow(0);
+          c33_vrow(1) = 0.;
+          c33_vrow(2) = c23_wrow(2);
+          c33_vrow(3) = 0.;
+          c33_vrow(4) = 0.;
           
-          c33_wrow[0] = -mu_R*w_momentum/sqr_density;
-          c33_wrow[1] = 0.;
-          c33_wrow[2] = 0.;
-          c33_wrow[3] = mu_R/density;
-          c33_wrow[4] = 0.; 
+          c33_wrow(0) = -mu_R*w_momentum/sqr_density;
+          c33_wrow(1) = 0.;
+          c33_wrow(2) = 0.;
+          c33_wrow(3) = mu_R/density;
+          c33_wrow(4) = 0.; 
           
-          c33_energyrow[0] = (u_momentum/density)*c33_urow[0] + (v_momentum/density)*c33_vrow[0] + (w_momentum/density)*c33_wrow[0] +
+          c33_energyrow(0) = (u_momentum/density)*c33_urow(0) + (v_momentum/density)*c33_vrow(0) + (w_momentum/density)*c33_wrow(0) +
                              (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*(-conserv_energy + (1./density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          c33_energyrow[1] = (u_momentum/density)*c33_urow[1] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
-          c33_energyrow[2] = (v_momentum/density)*c33_vrow[2] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
-          c33_energyrow[3] = (w_momentum/density)*c33_wrow[3] - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
-          c33_energyrow[4] = (_k_qp*_gamma_qp)/(density*_cp_qp);                     
+          c33_energyrow(1) = (u_momentum/density)*c33_urow(1) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*u_momentum;
+          c33_energyrow(2) = (v_momentum/density)*c33_vrow(2) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*v_momentum;
+          c33_energyrow(3) = (w_momentum/density)*c33_wrow(3) - (_k_qp*_gamma_qp)/(sqr_density*_cp_qp)*w_momentum;
+          c33_energyrow(4) = (_k_qp*_gamma_qp)/(density*_cp_qp);                     
           
           // ------------------------------------------------------------------
           // Organize previous iteration vectors to calculate Residuals
-          // U = [rho  rho_u  rho_v  rho_w  conserv_energy]
+          // U = (rho  rho_u  rho_v  rho_w  conserv_energy)
           // ------------------------------------------------------------------
-          dUdx[0] = grad_density(0);
-          dUdx[1] = grad_u_momentum(0);
-          dUdx[2] = grad_v_momentum(0);
-          dUdx[3] = grad_w_momentum(0);
-          dUdx[4] = grad_conserv_energy(0);
+          dUdx(0) = grad_density(0);
+          dUdx(1) = grad_u_momentum(0);
+          dUdx(2) = grad_v_momentum(0);
+          dUdx(3) = grad_w_momentum(0);
+          dUdx(4) = grad_conserv_energy(0);
           
-          dUdy[0] = grad_density(1);
-          dUdy[1] = grad_u_momentum(1);
-          dUdy[2] = grad_v_momentum(1);
-          dUdy[3] = grad_w_momentum(1);
-          dUdy[4] = grad_conserv_energy(1);
+          dUdy(0) = grad_density(1);
+          dUdy(1) = grad_u_momentum(1);
+          dUdy(2) = grad_v_momentum(1);
+          dUdy(3) = grad_w_momentum(1);
+          dUdy(4) = grad_conserv_energy(1);
           
-          dUdz[0] = grad_density(2);
-          dUdz[1] = grad_u_momentum(2);
-          dUdz[2] = grad_v_momentum(2);
-          dUdz[3] = grad_w_momentum(2);
-          dUdz[4] = grad_conserv_energy(2);        
+          dUdz(0) = grad_density(2);
+          dUdz(1) = grad_u_momentum(2);
+          dUdz(2) = grad_v_momentum(2);
+          dUdz(3) = grad_w_momentum(2);
+          dUdz(4) = grad_conserv_energy(2);        
           
           // ------------------------------------------------------------------
           // First, an ii loop over the velocity degrees of freedom. 
