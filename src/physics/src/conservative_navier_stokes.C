@@ -70,8 +70,8 @@ namespace GRINS
                                                                                                                                       VariablesParsing::PHYSICS))),
       _mu(input, MaterialsParsing::material_name(input, core_physics_name)),
       _cp(input, MaterialsParsing::material_name(input, core_physics_name)),
-      _k(input, MaterialsParsing::material_name(input, core_physics_name)),
-      _gamma(input, MaterialsParsing::material_name(input, core_physics_name))
+      _k(input, MaterialsParsing::material_name(input, core_physics_name)) //,
+      //_gamma(input, MaterialsParsing::material_name(input, core_physics_name))
     {
     
     // ---------------------------------------------------------------------------------
@@ -226,9 +226,9 @@ namespace GRINS
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
-      const std::vector<libMesh::Real>& JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
-      const std::vector<libMesh::Real>& JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
-      const std::vector<libMesh::Real>& JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
 
       // --------------------------------------------------------------------
       // Get Shape Functions at interior quadrature points for each variable
@@ -318,25 +318,25 @@ namespace GRINS
           /* ---  perform integration  --- */
           for (unsigned int ii = 0; ii != n_rho_dofs; ++ii)
             {
-              Frho(ii) -= this -> JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
+              Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
               
               // Need to add Mrho_rho calculations here
             }  // end density quadrature loop
           
           for (unsigned int ii = 0; ii != n_rho_u_dofs; ++ii)
             {
-              Frho_u(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_u_dot;
-              Frho_v(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_v_dot;
+              Frho_u(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_u_dot;
+              Frho_v(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_v_dot;
               
               if ( this -> _momentum_vars.dim() == 3)
-              (*Frho_w)(ii) -= this -> JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
+              (*Frho_w)(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
               
               // Need to add Mrho_u_rho_u, etc calculations here
             }  // end momentum quadrature loop
             
           for (unsigned int ii = 0; ii != n_conserv_energy_dofs; ++ii)
             {
-              Fconserv_energy(ii) -= this -> JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
+              Fconserv_energy(ii) -= JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
               
               // Need to add Menergy_energy calculations here
             }  // end conservative energy quadrature loop
@@ -671,10 +671,10 @@ namespace GRINS
           // -------------------------------------------------------------------
           // Compute Viscoity and Thermal Conductivity at this Quadrature Point
           // -------------------------------------------------------------------
-          libMesh::Real _mu_qp = this-> _mu(context, qp);
-          libMesh::Real _k_qp = this-> _k(context, qp);
-          libMesh::Real _cp_qp = this-> _cp(context, qp);
-          libMesh::Real _gamma_qp = this -> _gamma(context, qp);
+          libMesh::Real _mu_qp = _mu //this-> _mu(context, qp);
+          libMesh::Real _k_qp = _k  //this-> _k(context, qp);
+          libMesh::Real _cp_qp = _cp  //this-> _cp(context, qp);
+          libMesh::Real _gamma_qp = _gamma  //this -> _gamma(context, qp);
           
           // -------------------------------------------------------------------
           // Calculate jacobians (ai & cij)
