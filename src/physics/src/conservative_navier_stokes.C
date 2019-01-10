@@ -994,11 +994,11 @@ namespace GRINS
           // Organize previous iteration vectors to calculate Residuals
           // U = (rho  rho_u  rho_v  rho_w  conserv_energy)
           // ------------------------------------------------------------------
-          dUdx(0) = grad_density(0);
-          dUdx(1) = grad_u_momentum(0);
-          dUdx(2) = grad_v_momentum(0);
-          dUdx(3) = grad_w_momentum(0);
-          dUdx(4) = grad_conserv_energy(0);
+          dUdx[0] = grad_density(0);
+          dUdx[1] = grad_u_momentum(0);
+          dUdx[2] = grad_v_momentum(0);
+          dUdx[3] = grad_w_momentum(0);
+          dUdx[4] = grad_conserv_energy(0);
           
           dUdy(0) = grad_density(1);
           dUdy(1) = grad_u_momentum(1);
