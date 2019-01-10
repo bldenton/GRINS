@@ -610,7 +610,7 @@ namespace GRINS
       // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
       // ---------------------------------------------------------------------------------------------------------
       //libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
-      libMesh::TensorValue<libMesh::Number> dUdx(0., 0.,0.,0.,0.), dUdy(5), dUdz(5), dWdx(5), dWdy(5), dWdz(5);
+      libMesh::NumberVectorValue dUdx(0., 0.,0.,0.,0.), dUdy(5), dUdz(5), dWdx(5), dWdy(5), dWdz(5);
       libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
                                             a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
                                             a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.),
