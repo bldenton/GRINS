@@ -58,13 +58,13 @@ namespace GRINS
                                                                  const std::string& core_physics_name,
                                                                  const GetPot& input)
     : Physics(physics_name, input),
-      _density_var(GRINSPrivate::VariablesWarehouse::get_variable_subclass<DensityFEVariable>(VariablesParsing::density_variable_name(input,
+      _density_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<DensityFEVariable>(VariablesParsing::density_variable_name(input,
                                                                                                                                       core_physics_name,
                                                                                                                                       VariablesParsing::PHYSICS))),
-      _momentum_vars(GRINSPrivate::VariablesWarehouse::get_variable_subclass<ConservativeMomentumVariable>(VariablesParsing::conserv_momentum_variable_name(input,
+      _momentum_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<ConservativeMomentumVariable>(VariablesParsing::conserv_momentum_variable_name(input,
                                                                                                                                       core_physics_name, 
                                                                                                                                       VariablesParsing::PHYSICS))),
-      _conserv_energy_var(GRINSPrivate::VariablesWarehouse::get_variable_subclass<ConservativeEnergyFEVariable>(VariablesParsing::conserv_energy_variable_name(input,
+      _conserv_energy_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<ConservativeEnergyFEVariable>(VariablesParsing::conserv_energy_variable_name(input,
                                                                                                                                       core_physics_name, 
                                                                                                                                       VariablesParsing::PHYSICS))),
       _mu(input, MaterialsParsing::material_name(input, core_physics_name)),
@@ -686,7 +686,7 @@ namespace GRINS
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
                    
             /* --- calculate a1 matrix  --- */
-          a1_urow[0] = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
+          a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
           a1_urow[1] = (3. - _gamma_qp) * u_momentum/density;
           a1_urow[2] = (1. - _gamma_qp) * v_momentum/density;
           a1_urow[3] = (1. - _gamma_qp) * w_momentum/density;
