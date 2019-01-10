@@ -226,9 +226,9 @@ namespace GRINS
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
-      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
-      const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
-      const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
+      const std::vector<libMesh::Real>& JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
+      const std::vector<libMesh::Real>& JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
+      const std::vector<libMesh::Real>& JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
 
       // --------------------------------------------------------------------
       // Get Shape Functions at interior quadrature points for each variable
@@ -609,7 +609,8 @@ namespace GRINS
       // ---------------------------------------------------------------------------------------------------------
       // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
       // ---------------------------------------------------------------------------------------------------------
-      libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
+      //libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
+      libMesh::TensorValue<libMesh::Number> dUdx(5), dUdy(5), dUdz(5), dWdx(5), dWdy(5), dWdz(5);
       libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
                                             a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
                                             a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.),
