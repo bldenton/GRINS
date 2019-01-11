@@ -86,7 +86,8 @@ namespace GRINS
 
     if(  conductivity == "constant" && viscosity == "constant" && specific_heat == "constant" )
       new_physics.reset( new DerivedPhysics<ConstantViscosity,ConstantSpecificHeat,ConstantConductivity>
-                         (physics_name,input) );
+                         (physics_name, core_physics_name, input) );      // Note :: the number of parameters in the () need to match the number in the constructor
+
 /* ---
     // -----------------------------------------------------------------------------------
     // Original Coding -- saved for future use?
