@@ -56,22 +56,21 @@ namespace GRINS
 {
   template<class Mu, class SH, class TC>
   ConservativeNavierStokes<Mu, SH, TC>::ConservativeNavierStokes(const std::string& physics_name,
-                                                                 const std::string& core_physics_name,
-                                                                 const GetPot& input)
+                                                                 const GetPot& input )
     : Physics(physics_name, input),
       _density_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<DensityFEVariable>(VariablesParsing::density_variable_name(input,
-                                                                                                                                      core_physics_name,
-                                                                                                                                      VariablesParsing::PHYSICS))),
+                                                                                                                                     PhysicsNaming::conservative_navier_stokes(),
+                                                                                                                                     VariablesParsing::PHYSICS))),
       _momentum_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<ConservativeMomentumVariable>(VariablesParsing::conserv_momentum_variable_name(input,
-                                                                                                                                      core_physics_name, 
-                                                                                                                                      VariablesParsing::PHYSICS))),
+                                                                                                                                     PhysicsNaming::conservative_navier_stokes(), 
+                                                                                                                                     VariablesParsing::PHYSICS))),
       _conserv_energy_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<ConservativeEnergyFEVariable>(VariablesParsing::conserv_energy_variable_name(input,
-                                                                                                                                      core_physics_name, 
-                                                                                                                                      VariablesParsing::PHYSICS))),
-      _mu(input, MaterialsParsing::material_name(input, core_physics_name)),
-      _cp(input, MaterialsParsing::material_name(input, core_physics_name)),
-      _k(input, MaterialsParsing::material_name(input, core_physics_name)) //,
-      //_gamma(input, MaterialsParsing::material_name(input, core_physics_name))
+                                                                                                                                     PhysicsNaming::conservative_navier_stokes(), 
+                                                                                                                                     VariablesParsing::PHYSICS))),
+      _mu(input, MaterialsParsing::material_name(input, PhysicsNaming::conservative_navier_stokes())),
+      _cp(input, MaterialsParsing::material_name(input, PhysicsNaming::conservative_navier_stokes())),
+      _k(input, MaterialsParsing::material_name(input, PhysicsNaming::conservative_navier_stokes())) //,
+      //_gamma(input, MaterialsParsing::material_name(input, PhysicsNaming::conservative_navier_stokes()))
     {
     
     // ---------------------------------------------------------------------------------
@@ -672,7 +671,7 @@ namespace GRINS
           // -------------------------------------------------------------------
           libMesh::Real _mu_qp = this ->_mu(context, qp);
           libMesh::Real _k_qp = this-> _k(context, qp);
-          libMesh::Real _cp_qp = this-> _cp(context, qp);
+          libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
           
           // -------------------------------------------------------------------

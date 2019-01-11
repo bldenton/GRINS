@@ -46,8 +46,7 @@ namespace GRINS
   {
   public:
     ConservativeNavierStokes(const PhysicsName& physics_name,
-                             const std::string& core_physics_name,
-                             const GetPot& input);
+                             const GetPot& input );
     
     ~ConservativeNavierStokes(){};
     
