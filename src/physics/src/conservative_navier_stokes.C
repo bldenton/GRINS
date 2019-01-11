@@ -671,9 +671,9 @@ namespace GRINS
           // -------------------------------------------------------------------
           // Compute Viscoity and Thermal Conductivity at this Quadrature Point
           // -------------------------------------------------------------------
-          libMesh::Real _mu_qp = _mu; //this-> _mu(context, qp);
-          libMesh::Real _k_qp = _k;  //this-> _k(context, qp);
-          libMesh::Real _cp_qp = _cp;  //this-> _cp(context, qp);
+          libMesh::Real _mu_qp = this ->_mu(context, qp);
+          libMesh::Real _k_qp = this-> _k(context, qp);
+          libMesh::Real _cp_qp = this-> _cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
           
           // -------------------------------------------------------------------
