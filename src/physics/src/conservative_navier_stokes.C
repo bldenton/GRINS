@@ -609,23 +609,22 @@ namespace GRINS
       // ---------------------------------------------------------------------------------------------------------
       // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
       // ---------------------------------------------------------------------------------------------------------
-      //libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
-      libMesh::NumberVectorValue dUdx, dUdy, dUdz, dWdx, dWdy, dWdz;
-      libMesh::NumberVectorValue a1_urow, a1_vrow, a1_wrow, a1_energyrow,
-                                 a2_urow, a2_vrow, a2_wrow, a2_energyrow,
-                                 a3_urow, a3_vrow, a3_wrow, a3_energyrow,
-                                 c11_urow, c11_vrow, c11_wrow, c11_energyrow,
-                                 c12_urow, c12_vrow, c12_wrow, c12_energyrow,
-                                 c13_urow, c13_vrow, c13_wrow, c13_energyrow,
-                                 c21_urow, c21_vrow, c21_wrow, c21_energyrow,
-                                 c22_urow, c22_vrow, c22_wrow, c22_energyrow,
-                                 c23_urow, c23_vrow, c23_wrow, c23_energyrow,
-                                 c31_urow, c31_vrow, c31_wrow, c31_energyrow,
-                                 c32_urow, c32_vrow, c32_wrow, c32_energyrow,
-                                 c33_urow, c33_vrow, c33_wrow, c33_energyrow;
-      libMesh::NumberVectorValue d_dx_rho, d_dx_umomentum, d_dx_vmomentum, d_dx_wmomentum, d_dx_conserv_energy,
-                                 d_dy_rho, d_dy_umomentum, d_dy_vmomentum, d_dy_wmomentum, d_dy_conserv_energy,
-                                 d_dz_rho, d_dz_umomentum, d_dz_vmomentum, d_dz_wmomentum, d_dz_conserv_energy;
+      libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
+      libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
+                                            a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
+                                            a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.),
+                                            c11_urow(5, 0.), c11_vrow(5, 0.), c11_wrow(5, 0.), c11_energyrow(5, 0.),
+                                            c12_urow(5, 0.), c12_vrow(5, 0.), c12_wrow(5, 0.), c12_energyrow(5, 0.),
+                                            c13_urow(5, 0.), c13_vrow(5, 0.), c13_wrow(5, 0.), c13_energyrow(5, 0.),
+                                            c21_urow(5, 0.), c21_vrow(5, 0.), c21_wrow(5, 0.), c21_energyrow(5, 0.),
+                                            c22_urow(5, 0.), c22_vrow(5, 0.), c22_wrow(5, 0.), c22_energyrow(5, 0.),
+                                            c23_urow(5, 0.), c23_vrow(5, 0.), c23_wrow(5, 0.), c23_energyrow(5, 0.),
+                                            c31_urow(5, 0.), c31_vrow(5, 0.), c31_wrow(5, 0.), c31_energyrow(5, 0.),
+                                            c32_urow(5, 0.), c32_vrow(5, 0.), c32_wrow(5, 0.), c32_energyrow(5, 0.),
+                                            c33_urow(5, 0.), c33_vrow(5, 0.), c33_wrow(5, 0.), c33_energyrow(5, 0.);
+      libMesh::DenseVector<libMesh::Number> d_dx_rho(5, 0.), d_dx_umomentum(5, 0.), d_dx_vmomentum(5, 0.), d_dx_wmomentum(5, 0.), d_dx_conserv_energy(5, 0.),
+                                            d_dy_rho(5, 0.), d_dy_umomentum(5, 0.), d_dy_vmomentum(5, 0.), d_dy_wmomentum(5, 0.), d_dy_conserv_energy(5, 0.),
+                                            d_dz_rho(5, 0.), d_dz_umomentum(5, 0.), d_dz_vmomentum(5, 0.), d_dz_wmomentum(5, 0.), d_dz_conserv_energy(5, 0.);
       
       // -------------------------------------------------------------------------------------------------------------------------------------------------           
       // Loop over Quadrature Points and assemble
@@ -1019,28 +1018,28 @@ namespace GRINS
             {
               // F{rho_u}
               Frho_u(ii) -= JxW_momentum[qp] * 
-                    (momentum_phi[ii][qp] * (a1_urow*dUdx + a2_urow*dUdy + a3_urow*dUdz) +            // inviscid & inviscid-viscid interaction portions
-                    momentum_gradphi[ii][qp](0) * (c11_urow*dUdx + c12_urow*dUdy + c13_urow*dUdz) +
-                    momentum_gradphi[ii][qp](1) * (c21_urow*dUdx + c22_urow*dUdy + c23_urow*dUdz) +
-                    momentum_gradphi[ii][qp](2) * (c31_urow*dUdx + c32_urow*dUdy + c33_urow*dUdz)
+                    (momentum_phi[ii][qp] * (a1_urow.dot(dUdx) + a2_urow.dot(dUdy) + a3_urow.dot(dUdz)) +            // inviscid interaction portions
+                    momentum_gradphi[ii][qp](0) * (c11_urow.dot(dUdx) + c12_urow.dot(dUdy) + c13_urow.dot(dUdz)) +
+                    momentum_gradphi[ii][qp](1) * (c21_urow.dot(dUdx) + c22_urow.dot(dUdy) + c23_urow.dot(dUdz)) +
+                    momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz))
                     );
               
               // F{rho_v}     
               Frho_v(ii) -= JxW_momentum[qp] * 
-                    (momentum_phi[ii][qp] * (a1_vrow*dUdx + a2_vrow*dUdy + a3_vrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
-                    momentum_gradphi[ii][qp](0) * (c11_vrow*dUdx + c12_vrow*dUdy + c13_vrow*dUdz) +
-                    momentum_gradphi[ii][qp](1) * (c21_vrow*dUdx + c22_vrow*dUdy + c23_vrow*dUdz) +
-                    momentum_gradphi[ii][qp](2) * (c31_vrow*dUdx + c32_vrow*dUdy + c33_vrow*dUdz)
+                    (momentum_phi[ii][qp] * (a1_vrow.dot(dUdx) + a2_vrow.dot(dUdy) + a3_vrow.dot(dUdz)) +            // inviscid interaction portions
+                    momentum_gradphi[ii][qp](0) * (c11_vrow.dot(dUdx) + c12_vrow.dot(dUdy) + c13_vrow.dot(dUdz)) +
+                    momentum_gradphi[ii][qp](1) * (c21_vrow.dot(dUdx) + c22_vrow.dot(dUdy) + c23_vrow.dot(dUdz)) +
+                    momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz))
                     );
                     
               if (this->_momentum_vars.dim() == 3)
                 {
                   // F{rho_w}
                   (*Frho_w)(ii) -= JxW_momentum[qp] *
-                      (momentum_phi[ii][qp] * (a1_wrow*dUdx + a2_wrow*dUdy + a3_wrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
-                      momentum_gradphi[ii][qp](0) * (c11_wrow*dUdx + c12_wrow*dUdy + c13_wrow*dUdz) +
-                      momentum_gradphi[ii][qp](1) * (c21_wrow*dUdx + c22_wrow*dUdy + c23_wrow*dUdz) +
-                      momentum_gradphi[ii][qp](2) * (c31_wrow*dUdx + c32_wrow*dUdy + c33_wrow*dUdz)
+                      (momentum_phi[ii][qp] * (a1_wrow.dot(dUdx) + a2_wrow.dot(dUdy) + a3_wrow.dot(dUdz)) +          // inviscid interaction portions
+                      momentum_gradphi[ii][qp](0) * (c11_wrow.dot(dUdx) + c12_wrow.dot(dUdy) + c13_wrow.dot(dUdz)) +
+                      momentum_gradphi[ii][qp](1) * (c21_wrow.dot(dUdx) + c22_wrow.dot(dUdy) + c23_wrow.dot(dUdz)) +
+                      momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
                       );                
                 }  // End of 3D if statment 
                 
@@ -1174,10 +1173,10 @@ namespace GRINS
             {
               // F{conserv_energy}
               Fconserv_energy(ii) -= JxW_energy[qp] * 
-                    (conserv_energy_phi[ii][qp] * (a1_energyrow*dUdx + a2_energyrow*dUdy + a3_energyrow*dUdz) +    // inviscid & inviscid-viscid interaction portions
-                    conserv_energy_gradphi[ii][qp](0) * (c11_energyrow*dUdx + c12_energyrow*dUdy + c13_energyrow*dUdz) +
-                    conserv_energy_gradphi[ii][qp](1) * (c21_energyrow*dUdx + c22_energyrow*dUdy + c23_energyrow*dUdz) +
-                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow*dUdx + c32_energyrow*dUdy + c33_energyrow*dUdz)
+                    (conserv_energy_phi[ii][qp] * (a1_energyrow.dot(dUdx) + a2_energyrow.dot(dUdy) + a3_energyrow.dot(dUdz)) +            // inviscid interaction portions
+                    conserv_energy_gradphi[ii][qp](0) * (c11_energyrow.dot(dUdx) + c12_energyrow.dot(dUdy) + c13_energyrow.dot(dUdz)) +
+                    conserv_energy_gradphi[ii][qp](1) * (c21_energyrow.dot(dUdx) + c22_energyrow.dot(dUdy) + c23_energyrow.dot(dUdz)) +
+                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
                     );            
             }  // End of ii for energy degree of freedom
         }    // End of Quadrature Point For Loop            
