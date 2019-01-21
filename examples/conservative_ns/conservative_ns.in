@@ -1,0 +1,176 @@
+# ******************************************************************************************************
+# Conservative Navier Stokes Test Case
+#
+# The test case is a simple tube with a diameter of 1 and a length of 10. The case has been designed
+# with a Peclet Number of 1 since stabilization of the method has not been included. 
+# ******************************************************************************************************
+
+# -------------------
+# Mesh Information
+# -------------------
+[Mesh]
+  [./Read]
+    filename = 'conservative_ns_tube.xda'
+[]
+
+# ---------------------------
+# Input Material Information
+# ---------------------------
+[Materials]
+  [./gas]
+    [./Density]
+      value = '1.0'
+    [../Viscosity]
+      model = 'constant'
+      value = '1.0'
+    [../ThermalConductivity]
+      model 'constant'
+      value = '1.0'
+    [../SpecificHeat]
+      model = 'constant'
+      value = '1.0'
+    [../Gamma]
+      value = '1.4'   
+[]
+
+# ---------------------
+# Boundary Conditions
+# ---------------------
+[BoundaryConditions]
+  bc_ids = '1 2 3'
+  bc_id_name_map = 'Inlet Wall Outlet'
+  
+  # Every Boundary Condition must have all Variables Defined
+  [./Inlet]
+    [./ConservativeMomentum]
+      type = 'constant_dirichlet'
+      rho_u = '1.0'
+    [../]
+    
+    [./Density]
+      type = 'constant_dirichlet'
+      rho = '1.0'
+    [../]
+    
+    [./ConservativeEnergy]
+      type = 'constant_dirichlet'
+      conserv_energy = '1.0'
+    [../]
+  [../]
+  
+  [./Wall]
+    [./ConservativeMomentum]
+      type = 'homogeneous_dirichlet'
+    [../]
+    
+    [./Density]
+      type = 'homogeneous_neumann'
+    [../]
+    
+    [./ConservativeEnergy]
+      type = 'homogeneous_neumann'
+    [../]
+  [../]
+  
+  [./Outlet]
+    [./ConservativeMomentum]
+      type = 'homogeneous_neumann'
+    [../]
+    
+    [./Density]
+      type = 'homogeneous_neumann'
+    [../]
+    
+    [./ConservativeEnergy]
+      type = 'homogeneous_neumann'  
+    [../]
+  [../]
+[]
+
+# --------------------
+# Variables
+# --------------------
+[Variables]
+  [./Density]
+    names = 'rho'
+    fe_family = 'LAGRANGE'
+    order = 'SECOND'
+    enabled_subdomains = '1'
+  [../]
+  
+  [./ConservativeMomentum]
+    names = 'rho_u rho_v rho_w'
+    fe_family = 'LAGRANGE'
+    order = 'SECOND'
+    enabled_subdomains = '1'
+  [../]
+  
+  [./ConservativeEnergy]
+    names = 'conserv_energy'
+    fe_family = 'LAGRANGE'
+    order = 'SECOND'
+    enabled_subdomains = '1'
+  [../]
+[]
+
+# -----------------
+# Physics
+# -----------------
+[Physics]
+  enabled_phyics = 'ConservativeNavierStokes'
+  
+  [./ConservativeNavierStokes]
+    material = 'gas'
+[]
+
+# ---------------------------
+# Options for time solvers
+# ---------------------------
+[unsteady-solver]
+transient = 'false'
+[]
+
+# ------------------------------------
+# Linear and nonlinear solver options
+# ------------------------------------
+[linear-nonlinear-solver]
+max_nonlinear_iterations =  25
+max_linear_iterations = 2500
+
+verify_analytic_jacobians = 0.0
+
+initial_linear_tolerance = 1.0e-10
+
+use_numerical_jacobians_only = 'true'
+[]
+
+# ------------------------
+# Visualization options
+# ------------------------
+[vis-options]
+output_vis = true
+
+vis_output_file_prefix = 'conserv_ns_tube'
+
+output_residual = 'true'
+
+output_format = 'ExodusII xdr'
+[]
+
+# --------------------------------------
+# Options for print info to the screen
+# --------------------------------------
+[screen-options]
+
+system_name = 'ConservNStube'
+
+print_equation_system_info = true
+print_mesh_info = true
+print_log_info = true
+solver_verbose = true
+solver_quiet = false
+
+print_element_jacobians = 'false'
+
+[]
+
