@@ -190,7 +190,7 @@ namespace GRINS
     { return VariablesParsing::section_parse_var_name(input,
                                                       subsection_name,
                                                       "conserv_momentum_var_name",
-                                                      VariablesParsing::velocity_section(),
+                                                      VariablesParsing::conserv_momentum_section(),
                                                       section_type); }
 
   private:

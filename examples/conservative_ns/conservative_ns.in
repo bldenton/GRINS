@@ -24,7 +24,7 @@
       model = 'constant'
       value = '1.0'
     [../ThermalConductivity]
-      model 'constant'
+      model = 'constant'
       value = '1.0'
     [../SpecificHeat]
       model = 'constant'
@@ -117,7 +117,7 @@
 # Physics
 # -----------------
 [Physics]
-  enabled_phyics = 'ConservativeNavierStokes'
+  enabled_physics = 'ConservativeNavierStokes'
   
   [./ConservativeNavierStokes]
     material = 'gas'
