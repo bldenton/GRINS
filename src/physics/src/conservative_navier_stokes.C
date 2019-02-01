@@ -482,7 +482,9 @@ namespace GRINS
               }    // End of compute_jacobian if statment
               */
             }    // End of density degree of freedom loop                      
-        }    // End Quadrature Loop       
+        }    // End Quadrature Loop  
+      
+      return;     
     }
     
     // -----------------------------------------------------------------
@@ -1178,7 +1180,9 @@ namespace GRINS
                     conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
                     );            
             }  // End of ii for energy degree of freedom
-        }    // End of Quadrature Point For Loop            
+        }    // End of Quadrature Point For Loop
+      
+      return;            
     }    // End of assemble_momentum_time_derivative()
     
     // --- Register Parameters
