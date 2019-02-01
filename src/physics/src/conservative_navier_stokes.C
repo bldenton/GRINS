@@ -362,9 +362,9 @@ namespace GRINS
                 
               if ( this -> _momentum_vars.dim() == 3)                
                 {
-                  if(std::isnan(*(Frho_w)(ii)))
+                  if(std::isnan((*Frho_w)(ii)))
                     { std::cout << "--- mass_residual() ---" << "\n";
-                      std::cout << "Frho_w(ii) = " << *(Frho_w)(ii) << "\n";
+                      std::cout << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
                       std::cout << "ii = " << ii;
                       std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
                       std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
