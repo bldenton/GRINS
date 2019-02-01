@@ -319,6 +319,16 @@ namespace GRINS
             {
               Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
               
+              if(std::isnan(Frho(ii)))
+                { std::cout << "--- mass_residual() ---" << "\n";
+                  std::cout << "Frho(ii) = " << Frho(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
+                  std::cout << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
+                  std::cout << "rho_dot = " << rho_dot << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
+              
               // Need to add Mrho_rho calculations here
             }  // end density quadrature loop
           
@@ -330,12 +340,52 @@ namespace GRINS
               if ( this -> _momentum_vars.dim() == 3)
               (*Frho_w)(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
               
+              if(std::isnan(Frho_u(ii)))
+                { std::cout << "--- mass_residual() ---" << "\n";
+                  std::cout << "Frho_u(ii) = " << Frho_u(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                  std::cout << "rho_u_dot = " << rho_u_dot << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
+              
+              if(std::isnan(Frho_v(ii)))
+                { std::cout << "--- mass_residual() ---" << "\n";
+                  std::cout << "Frho_v(ii) = " << Frho_v(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                  std::cout << "rho_v_dot = " << rho_v_dot << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
+                
+              if(std::isnan(Frho_w(ii)))
+                { std::cout << "--- mass_residual() ---" << "\n";
+                  std::cout << "Frho_w(ii) = " << Frho_w(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                  std::cout << "rho_w_dot = " << rho_w_dot << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
+              
               // Need to add Mrho_u_rho_u, etc calculations here
             }  // end momentum quadrature loop
             
           for (unsigned int ii = 0; ii != n_conserv_energy_dofs; ++ii)
             {
               Fconserv_energy(ii) -= JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
+              
+              if(std::isnan(Fconserv_energy(ii)))
+                { std::cout << "--- mass_residual() ---" << "\n";
+                  std::cout << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
+                  std::cout << "conserv_energy_phi[ii][qp] = " << conserv_energy_phi[ii][qp] << "\n";
+                  std::cout << "energy_dot = " << energy_dot << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
               
               // Need to add Menergy_energy calculations here
             }  // end conservative energy quadrature loop
@@ -447,6 +497,18 @@ namespace GRINS
           for (unsigned ii=0; ii != n_rho_dofs; ii++)
             {
               Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z);
+              
+              if(std::isnan(Frho(ii)))
+                { std::cout << "--- assemble_mass_time_derivative() ---" << "\n";
+                  std::cout << "Frho(ii) = " << Frho(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
+                  std::cout << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
+                  std::cout << "grad_u_momentum_x = " << grad_u_momentum_x << "\n";
+                  std::cout << "grad_v_momentum_y = " << grad_v_momentum_y << "\n";
+                  std::cout << "grad_w_momentum_z = " << grad_w_momentum_z << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
               
               /* if (compute_jacobian)
               {
@@ -1024,6 +1086,14 @@ namespace GRINS
                     momentum_gradphi[ii][qp](1) * (c21_urow.dot(dUdx) + c22_urow.dot(dUdy) + c23_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz))
                     );
+                    
+              if(std::isnan(Frho_u(ii)))
+                { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
+                  std::cout << "Frho_u(ii) = " << Frho_u(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
               
               // F{rho_v}     
               Frho_v(ii) -= JxW_momentum[qp] * 
@@ -1033,6 +1103,14 @@ namespace GRINS
                     momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz))
                     );
                     
+              if(std::isnan(Frho_v(ii)))
+                { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
+                  std::cout << "Frho_v(ii) = " << Frho_v(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }
+                    
               if (this->_momentum_vars.dim() == 3)
                 {
                   // F{rho_w}
@@ -1041,7 +1119,15 @@ namespace GRINS
                       momentum_gradphi[ii][qp](0) * (c11_wrow.dot(dUdx) + c12_wrow.dot(dUdy) + c13_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](1) * (c21_wrow.dot(dUdx) + c22_wrow.dot(dUdy) + c23_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
-                      );                
+                      );
+                      
+                  if(std::isnan(Frho_w(ii)))
+                    { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
+                      std::cout << "Frho_w(ii) = " << Frho_w(ii) << "\n";
+                      std::cout << "ii = " << ii;
+                      std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                      std::cout << " -----------------------" << "\n";
+                    }                
                 }  // End of 3D if statment 
                 
               /* if (compute_jacobian)
@@ -1178,7 +1264,15 @@ namespace GRINS
                     conserv_energy_gradphi[ii][qp](0) * (c11_energyrow.dot(dUdx) + c12_energyrow.dot(dUdy) + c13_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow.dot(dUdx) + c22_energyrow.dot(dUdy) + c23_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
-                    );            
+                    );    
+                    
+              if(std::isnan(Fconserv_energy(ii)))
+                { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
+                  std::cout << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
+                  std::cout << "ii = " << ii;
+                  std::cout << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
+                  std::cout << " -----------------------" << "\n";
+                }        
             }  // End of ii for energy degree of freedom
         }    // End of Quadrature Point For Loop
       
