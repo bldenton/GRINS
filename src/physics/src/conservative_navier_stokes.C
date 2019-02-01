@@ -1124,9 +1124,9 @@ namespace GRINS
                       momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
                       );
                       
-                  if(std::isnan(Frho_w(ii)))
+                  if(std::isnan((*Frho_w)(ii)))
                     { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
-                      std::cout << "Frho_w(ii) = " << Frho_w(ii) << "\n";
+                      std::cout << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
                       std::cout << "ii = " << ii;
                       std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
                       std::cout << " -----------------------" << "\n";
