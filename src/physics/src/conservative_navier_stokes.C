@@ -1093,8 +1093,11 @@ namespace GRINS
               if(std::isnan(Frho_u(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Frho_u(ii) = " << Frho_u(ii) << "\n";
-                  std::cout << "ii = " << ii;
+                  std::cout << "ii = " << ii << "\n";
                   std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << "a1_urow.dot(dUdx) = " << a1_urow.dot(dUdx) << "\n";
+                  std::cout << "a2_urow.dot(dUdy) = " << a2_urow.dot(dUdy) << "\n";
+                  std::cout << "a3_urow.dot(dUdz) = " << a3_urow.dot(dUdz) << "\n";
                   std::cout << " -----------------------" << "\n";
                 }
               
@@ -1109,8 +1112,11 @@ namespace GRINS
               if(std::isnan(Frho_v(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Frho_v(ii) = " << Frho_v(ii) << "\n";
-                  std::cout << "ii = " << ii;
+                  std::cout << "ii = " << ii << "\n";
                   std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  std::cout << "a1_vrow.dot(dUdx) = " << a1_vrow.dot(dUdx) << "\n";
+                  std::cout << "a2_vrow.dot(dUdy) = " << a2_vrow.dot(dUdy) << "\n";
+                  std::cout << "a3_vrow.dot(dUdz) = " << a3_vrow.dot(dUdz) << "\n";
                   std::cout << " -----------------------" << "\n";
                 }
                     
@@ -1127,7 +1133,7 @@ namespace GRINS
                   if(std::isnan((*Frho_w)(ii)))
                     { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                       std::cout << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
-                      std::cout << "ii = " << ii;
+                      std::cout << "ii = " << ii << "\n";
                       std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
                       std::cout << " -----------------------" << "\n";
                     }                
