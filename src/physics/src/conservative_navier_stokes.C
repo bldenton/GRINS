@@ -360,15 +360,18 @@ namespace GRINS
                   std::cout << " -----------------------" << "\n";
                 }
                 
-              if(std::isnan(Frho_w(ii)))
-                { std::cout << "--- mass_residual() ---" << "\n";
-                  std::cout << "Frho_w(ii) = " << Frho_w(ii) << "\n";
-                  std::cout << "ii = " << ii;
-                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                  std::cout << "rho_w_dot = " << rho_w_dot << "\n";
-                  std::cout << " -----------------------" << "\n";
-                }
+              if ( this -> _momentum_vars.dim() == 3)                
+                {
+                  if(std::isnan(Frho_w(ii)))
+                    { std::cout << "--- mass_residual() ---" << "\n";
+                      std::cout << "Frho_w(ii) = " << Frho_w(ii) << "\n";
+                      std::cout << "ii = " << ii;
+                      std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                      std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                      std::cout << "rho_w_dot = " << rho_w_dot << "\n";
+                      std::cout << " -----------------------" << "\n";
+                    }
+                 } 
               
               // Need to add Mrho_u_rho_u, etc calculations here
             }  // end momentum quadrature loop
