@@ -52,6 +52,10 @@
 #include "libmesh/utility.h"
 #include "libmesh/dense_vector.h"
 
+// c++ Write Debugging to file
+#include <iostream>
+#include <fstream>
+
 namespace GRINS
 {
   template<class Mu, class SH, class TC>
@@ -222,6 +226,10 @@ namespace GRINS
       // ------ M(u)                                        -----
       // --------------------------------------------------------
       
+      // Open Debug File
+      std::ofstream mass_r;
+      mass_r.open("mass_residual_NaN.txt");
+      
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
@@ -320,13 +328,13 @@ namespace GRINS
               Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
               
               if(std::isnan(Frho(ii)))
-                { std::cout << "--- mass_residual() ---" << "\n";
-                  std::cout << "Frho(ii) = " << Frho(ii) << "\n";
-                  std::cout << "ii = " << ii;
-                  std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
-                  std::cout << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
-                  std::cout << "rho_dot = " << rho_dot << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { mass_r << "--- mass_residual() ---" << "\n";
+                  mass_r << "Frho(ii) = " << Frho(ii) << "\n";
+                  mass_r << "ii = " << ii;
+                  mass_r << "JxW_density[qp] = " << JxW_density[qp] << "\n";
+                  mass_r << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
+                  mass_r << "rho_dot = " << rho_dot << "\n";
+                  mass_r << " -----------------------" << "\n";
                 }
               
               // Need to add Mrho_rho calculations here
@@ -341,35 +349,35 @@ namespace GRINS
               (*Frho_w)(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
               
               if(std::isnan(Frho_u(ii)))
-                { std::cout << "--- mass_residual() ---" << "\n";
-                  std::cout << "Frho_u(ii) = " << Frho_u(ii) << "\n";
-                  std::cout << "ii = " << ii;
-                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                  std::cout << "rho_u_dot = " << rho_u_dot << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { mass_r << "--- mass_residual() ---" << "\n";
+                  mass_r << "Frho_u(ii) = " << Frho_u(ii) << "\n";
+                  mass_r << "ii = " << ii;
+                  mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                  mass_r << "rho_u_dot = " << rho_u_dot << "\n";
+                  mass_r << " -----------------------" << "\n";
                 }
               
               if(std::isnan(Frho_v(ii)))
-                { std::cout << "--- mass_residual() ---" << "\n";
-                  std::cout << "Frho_v(ii) = " << Frho_v(ii) << "\n";
-                  std::cout << "ii = " << ii;
-                  std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                  std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                  std::cout << "rho_v_dot = " << rho_v_dot << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { mass_r << "--- mass_residual() ---" << "\n";
+                  mass_r << "Frho_v(ii) = " << Frho_v(ii) << "\n";
+                  mass_r << "ii = " << ii;
+                  mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                  mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                  mass_r << "rho_v_dot = " << rho_v_dot << "\n";
+                  mass_r << " -----------------------" << "\n";
                 }
                 
               if ( this -> _momentum_vars.dim() == 3)                
                 {
                   if(std::isnan((*Frho_w)(ii)))
-                    { std::cout << "--- mass_residual() ---" << "\n";
-                      std::cout << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
-                      std::cout << "ii = " << ii;
-                      std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                      std::cout << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                      std::cout << "rho_w_dot = " << rho_w_dot << "\n";
-                      std::cout << " -----------------------" << "\n";
+                    { mass_r << "--- mass_residual() ---" << "\n";
+                      mass_r << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
+                      mass_r << "ii = " << ii;
+                      mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
+                      mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
+                      mass_r << "rho_w_dot = " << rho_w_dot << "\n";
+                      mass_r << " -----------------------" << "\n";
                     }
                  } 
               
@@ -381,18 +389,20 @@ namespace GRINS
               Fconserv_energy(ii) -= JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
               
               if(std::isnan(Fconserv_energy(ii)))
-                { std::cout << "--- mass_residual() ---" << "\n";
-                  std::cout << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
-                  std::cout << "ii = " << ii;
-                  std::cout << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
-                  std::cout << "conserv_energy_phi[ii][qp] = " << conserv_energy_phi[ii][qp] << "\n";
-                  std::cout << "energy_dot = " << energy_dot << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { mass_r << "--- mass_residual() ---" << "\n";
+                  mass_r << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
+                  mass_r << "ii = " << ii;
+                  mass_r << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
+                  mass_r << "conserv_energy_phi[ii][qp] = " << conserv_energy_phi[ii][qp] << "\n";
+                  mass_r << "energy_dot = " << energy_dot << "\n";
+                  mass_r << " -----------------------" << "\n";
                 }
               
               // Need to add Menergy_energy calculations here
             }  // end conservative energy quadrature loop
-        }  // end of qp loop    
+        }  // end of qp loop
+        
+        mass_r.close();    
     }
     
     // ----------------------------------------------------------
