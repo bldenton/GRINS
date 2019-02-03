@@ -1085,23 +1085,7 @@ namespace GRINS
           dUdz(1) = grad_u_momentum(2);
           dUdz(2) = grad_v_momentum(2);
           dUdz(3) = grad_w_momentum(2);
-          dUdz(4) = grad_conserv_energy(2);   
-          
-          std::cout << "dUdx(0) = " << dUdx(0) << "\n";
-          std::cout << "dUdx(1) = " << dUdx(1) << "\n"; 
-          std::cout << "dUdx(2) = " << dUdx(2) << "\n"; 
-          std::cout << "dUdx(3) = " << dUdx(3) << "\n"; 
-          std::cout << "dUdx(4) = " << dUdx(4) << "\n";
-          std::cout << "dUdy(0) = " << dUdy(0) << "\n";
-          std::cout << "dUdy(1) = " << dUdy(1) << "\n"; 
-          std::cout << "dUdy(2) = " << dUdy(2) << "\n"; 
-          std::cout << "dUdy(3) = " << dUdy(3) << "\n"; 
-          std::cout << "dUdy(4) = " << dUdy(4) << "\n";  
-          std::cout << "dUdz(0) = " << dUdz(0) << "\n";
-          std::cout << "dUdz(1) = " << dUdz(1) << "\n"; 
-          std::cout << "dUdz(2) = " << dUdz(2) << "\n"; 
-          std::cout << "dUdz(3) = " << dUdz(3) << "\n"; 
-          std::cout << "dUdz(4) = " << dUdz(4) << "\n";    
+          dUdz(4) = grad_conserv_energy(2);    
           
           // ------------------------------------------------------------------
           // First, an ii loop over the velocity degrees of freedom. 
@@ -1124,6 +1108,70 @@ namespace GRINS
                   std::cout << "a1_urow.dot(dUdx) = " << a1_urow.dot(dUdx) << "\n";
                   std::cout << "a2_urow.dot(dUdy) = " << a2_urow.dot(dUdy) << "\n";
                   std::cout << "a3_urow.dot(dUdz) = " << a3_urow.dot(dUdz) << "\n";
+                  std::cout << "dUdx(0) = " << dUdx(0) << "\n";
+                  std::cout << "dUdx(1) = " << dUdx(1) << "\n"; 
+                  std::cout << "dUdx(2) = " << dUdx(2) << "\n"; 
+                  std::cout << "dUdx(3) = " << dUdx(3) << "\n"; 
+                  std::cout << "dUdx(4) = " << dUdx(4) << "\n";
+                  std::cout << "dUdy(0) = " << dUdy(0) << "\n";
+                  std::cout << "dUdy(1) = " << dUdy(1) << "\n"; 
+                  std::cout << "dUdy(2) = " << dUdy(2) << "\n"; 
+                  std::cout << "dUdy(3) = " << dUdy(3) << "\n"; 
+                  std::cout << "dUdy(4) = " << dUdy(4) << "\n";  
+                  std::cout << "dUdz(0) = " << dUdz(0) << "\n";
+                  std::cout << "dUdz(1) = " << dUdz(1) << "\n"; 
+                  std::cout << "dUdz(2) = " << dUdz(2) << "\n"; 
+                  std::cout << "dUdz(3) = " << dUdz(3) << "\n"; 
+                  std::cout << "dUdz(4) = " << dUdz(4) << "\n";
+                  
+                  std::cout << "a1_urow(0) = " << a1_urow(0) << "\n";
+                  std::cout << "a1_urow(1) = " << a1_urow(1) << "\n";
+                  std::cout << "a1_urow(2) = " << a1_urow(2) << "\n";
+                  std::cout << "a1_urow(3) = " << a1_urow(3) << "\n";
+                  std::cout << "a1_urow(4) = " << a1_urow(4) << "\n";
+                  std::cout << "a1_vrow(0) = " << a1_vrow(0) << "\n";
+                  std::cout << "a1_vrow(1) = " << a1_vrow(1) << "\n";
+                  std::cout << "a1_vrow(2) = " << a1_vrow(2) << "\n";
+                  std::cout << "a1_vrow(3) = " << a1_vrow(3) << "\n";
+                  std::cout << "a1_vrow(4) = " << a1_vrow(4) << "\n";
+                  std::cout << "a1_wrow(0) = " << a1_wrow(0) << "\n";
+                  std::cout << "a1_wrow(1) = " << a1_wrow(1) << "\n";
+                  std::cout << "a1_wrow(2) = " << a1_wrow(2) << "\n";
+                  std::cout << "a1_wrow(3) = " << a1_wrow(3) << "\n";
+                  std::cout << "a1_wrow(4) = " << a1_wrow(4) << "\n";
+                  
+                  std::cout << "a2_urow(0) = " << a2_urow(0) << "\n";
+                  std::cout << "a2_urow(1) = " << a2_urow(1) << "\n";
+                  std::cout << "a2_urow(2) = " << a2_urow(2) << "\n";
+                  std::cout << "a2_urow(3) = " << a2_urow(3) << "\n";
+                  std::cout << "a2_urow(4) = " << a2_urow(4) << "\n";
+                  std::cout << "a2_vrow(0) = " << a2_vrow(0) << "\n";
+                  std::cout << "a2_vrow(1) = " << a2_vrow(1) << "\n";
+                  std::cout << "a2_vrow(2) = " << a2_vrow(2) << "\n";
+                  std::cout << "a2_vrow(3) = " << a2_vrow(3) << "\n";
+                  std::cout << "a2_vrow(4) = " << a2_vrow(4) << "\n";
+                  std::cout << "a2_wrow(0) = " << a2_wrow(0) << "\n";
+                  std::cout << "a2_wrow(1) = " << a2_wrow(1) << "\n";
+                  std::cout << "a2_wrow(2) = " << a2_wrow(2) << "\n";
+                  std::cout << "a2_wrow(3) = " << a2_wrow(3) << "\n";
+                  std::cout << "a2_wrow(4) = " << a2_wrow(4) << "\n";
+                  
+                  std::cout << "a3_urow(0) = " << a3_urow(0) << "\n";
+                  std::cout << "a3_urow(1) = " << a3_urow(1) << "\n";
+                  std::cout << "a3_urow(2) = " << a3_urow(2) << "\n";
+                  std::cout << "a3_urow(3) = " << a3_urow(3) << "\n";
+                  std::cout << "a3_urow(4) = " << a3_urow(4) << "\n";
+                  std::cout << "a3_vrow(0) = " << a3_vrow(0) << "\n";
+                  std::cout << "a3_vrow(1) = " << a3_vrow(1) << "\n";
+                  std::cout << "a3_vrow(2) = " << a3_vrow(2) << "\n";
+                  std::cout << "a3_vrow(3) = " << a3_vrow(3) << "\n";
+                  std::cout << "a3_vrow(4) = " << a3_vrow(4) << "\n";
+                  std::cout << "a3_wrow(0) = " << a3_wrow(0) << "\n";
+                  std::cout << "a3_wrow(1) = " << a3_wrow(1) << "\n";
+                  std::cout << "a3_wrow(2) = " << a3_wrow(2) << "\n";
+                  std::cout << "a3_wrow(3) = " << a3_wrow(3) << "\n";
+                  std::cout << "a3_wrow(4) = " << a3_wrow(4) << "\n";
+                  
                   std::cout << " -----------------------" << "\n";
                 }
               
