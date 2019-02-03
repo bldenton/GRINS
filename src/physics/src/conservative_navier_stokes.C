@@ -228,7 +228,7 @@ namespace GRINS
       
       // Open Debug File
       std::ofstream mass_r;
-      mass_r.open("mass_residual_NaN.txt");
+      mass_r.open("mass_residual_NaN.txt",ios::app);
       
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
@@ -750,6 +750,11 @@ namespace GRINS
           libMesh::Real _k_qp = this-> _k(context, qp);
           libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
+          
+          std::cout << "_mu_qp = " << _mu_qp << "\n";
+          std::cout << "_k_qp = " << _k_qp << "\n";
+          std::cout << "_cp_qp = " << _cp_qp << "\n";
+          std::cout << "_gamma_qp = " << _gamma_qp << "\n";
           
           // -------------------------------------------------------------------
           // Calculate jacobians (ai & cij)
@@ -1288,7 +1293,7 @@ namespace GRINS
               if(std::isnan(Fconserv_energy(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
-                  std::cout << "ii = " << ii;
+                  std::cout << "ii = " << ii << "\n";
                   std::cout << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
                   std::cout << " -----------------------" << "\n";
                 }        
