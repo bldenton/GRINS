@@ -1108,6 +1108,7 @@ namespace GRINS
                   std::cout << "a1_urow.dot(dUdx) = " << a1_urow.dot(dUdx) << "\n";
                   std::cout << "a2_urow.dot(dUdy) = " << a2_urow.dot(dUdy) << "\n";
                   std::cout << "a3_urow.dot(dUdz) = " << a3_urow.dot(dUdz) << "\n";
+                  std::cout << "density = " << density << "\n";
                   std::cout << "dUdx(0) = " << dUdx(0) << "\n";
                   std::cout << "dUdx(1) = " << dUdx(1) << "\n"; 
                   std::cout << "dUdx(2) = " << dUdx(2) << "\n"; 
