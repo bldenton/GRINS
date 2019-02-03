@@ -759,16 +759,8 @@ namespace GRINS
           libMesh::Real sqr_v_momentum = v_momentum * v_momentum;
           libMesh::Real sqr_w_momentum = (this->_momentum_vars.dim() == 3)?(w_momentum*w_momentum):0;
           
-          std::cout << "sqr_density = " << sqr_density << "\n";
-          std::cout << "sqr_u_momentum = " << sqr_u_momentum << "\n";
-          std::cout << "sqr_v_momentum = " << sqr_v_momentum << "\n";          
-          std::cout << "sqr_w_momentum = " << sqr_w_momentum << "\n";
-          
           libMesh::Real lambda = -(2./3.)*_mu_qp;
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
-          
-          std::cout << "lambda = " << lambda << "\n";
-          std::cout << "mu_R = " << mu_R << "\n";
                    
             /* --- calculate a1 matrix  --- */
           a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
@@ -1093,7 +1085,23 @@ namespace GRINS
           dUdz(1) = grad_u_momentum(2);
           dUdz(2) = grad_v_momentum(2);
           dUdz(3) = grad_w_momentum(2);
-          dUdz(4) = grad_conserv_energy(2);        
+          dUdz(4) = grad_conserv_energy(2);   
+          
+          std::cout << "dUdx(0) = " << dUdx(0) << "\n";
+          std::cout << "dUdx(1) = " << dUdx(1) << "\n"; 
+          std::cout << "dUdx(2) = " << dUdx(2) << "\n"; 
+          std::cout << "dUdx(3) = " << dUdx(3) << "\n"; 
+          std::cout << "dUdx(4) = " << dUdx(4) << "\n";
+          std::cout << "dUdy(0) = " << dUdy(0) << "\n";
+          std::cout << "dUdy(1) = " << dUdy(1) << "\n"; 
+          std::cout << "dUdy(2) = " << dUdy(2) << "\n"; 
+          std::cout << "dUdy(3) = " << dUdy(3) << "\n"; 
+          std::cout << "dUdy(4) = " << dUdy(4) << "\n";  
+          std::cout << "dUdz(0) = " << dUdz(0) << "\n";
+          std::cout << "dUdz(1) = " << dUdz(1) << "\n"; 
+          std::cout << "dUdz(2) = " << dUdz(2) << "\n"; 
+          std::cout << "dUdz(3) = " << dUdz(3) << "\n"; 
+          std::cout << "dUdz(4) = " << dUdz(4) << "\n";    
           
           // ------------------------------------------------------------------
           // First, an ii loop over the velocity degrees of freedom. 
