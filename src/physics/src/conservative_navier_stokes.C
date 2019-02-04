@@ -722,7 +722,7 @@ namespace GRINS
             /* --- Density Value at Quadrature Point --- */
           density = context.interior_value(this->_density_var.rho(), qp);
           
-          if (this -> density == 0.0) 
+          if ( density == 0.0 ) 
             { density = _rho_initial; }
           
             /* --- Momentum Values at Quadrature Point --- */
