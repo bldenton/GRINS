@@ -126,6 +126,9 @@ namespace GRINS
     // Gravity Vector
     libMesh::Point _g;
     
+    // Initial Density (This is a hack. probably need to remove this in the end)
+    libMesh::Real _rho_initial;
+    
   private:
     ConservativeNavierStokes();
     

@@ -116,7 +116,12 @@ namespace GRINS
                                        "Gamma",
                                        PhysicsNaming::conservative_navier_stokes(),
                                        (*this),
-                                       _gamma);      
+                                       _gamma);
+      MaterialsParsing::read_property( input,
+                                       "Density",
+                                       PhysicsNaming::conservative_navier_stokes(),
+                                       (*this),
+                                       _rho_initial);     
       
       //Read Gravity Vector
       unsigned int g_dim = input.vector_variable_size("Physics/"+PhysicsNaming::conservative_navier_stokes()+"/g");
@@ -716,6 +721,9 @@ namespace GRINS
           
             /* --- Density Value at Quadrature Point --- */
           density = context.interior_value(this->_density_var.rho(), qp);
+          
+          if (this -> density == 0.0) 
+            { density = _rho_initial; }
           
             /* --- Momentum Values at Quadrature Point --- */
           u_momentum = context.interior_value(this->_momentum_vars.rho_u(), qp);
