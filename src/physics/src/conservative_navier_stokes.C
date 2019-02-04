@@ -519,7 +519,7 @@ namespace GRINS
               if(std::isnan(Frho(ii)))
                 { std::cout << "--- assemble_mass_time_derivative() ---" << "\n";
                   std::cout << "Frho(ii) = " << Frho(ii) << "\n";
-                  std::cout << "ii = " << ii;
+                  std::cout << "ii = " << ii << "\n";
                   std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
                   std::cout << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
                   std::cout << "grad_u_momentum_x = " << grad_u_momentum_x << "\n";
@@ -1116,7 +1116,9 @@ namespace GRINS
                   std::cout << "a1_urow.dot(dUdx) = " << a1_urow.dot(dUdx) << "\n";
                   std::cout << "a2_urow.dot(dUdy) = " << a2_urow.dot(dUdy) << "\n";
                   std::cout << "a3_urow.dot(dUdz) = " << a3_urow.dot(dUdz) << "\n";
+                  std::cout << "\n";
                   std::cout << "density = " << density << "\n";
+                  std::cout << "\n";
                   std::cout << "dUdx(0) = " << dUdx(0) << "\n";
                   std::cout << "dUdx(1) = " << dUdx(1) << "\n"; 
                   std::cout << "dUdx(2) = " << dUdx(2) << "\n"; 
