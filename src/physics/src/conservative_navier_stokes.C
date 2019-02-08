@@ -694,6 +694,9 @@ namespace GRINS
       libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
                                             a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
                                             a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.),
+                                            b1_urow(5, 0.), b1_vrow(5, 0.), b1_wrow(5, 0.), b1_energyrow(5, 0.),
+                                            b2_urow(5, 0.), b2_vrow(5, 0.), b2_wrow(5, 0.), b2_energyrow(5, 0.),
+                                            b3_urow(5, 0.), b3_vrow(5, 0.), b3_wrow(5, 0.), b3_energyrow(5, 0.),
                                             c11_urow(5, 0.), c11_vrow(5, 0.), c11_wrow(5, 0.), c11_energyrow(5, 0.),
                                             c12_urow(5, 0.), c12_vrow(5, 0.), c12_wrow(5, 0.), c12_energyrow(5, 0.),
                                             c13_urow(5, 0.), c13_vrow(5, 0.), c13_wrow(5, 0.), c13_energyrow(5, 0.),
@@ -760,8 +763,9 @@ namespace GRINS
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
           
           // -------------------------------------------------------------------
-          // Calculate jacobians (ai & cij)
+          // Calculate jacobians (ai, bi & cij)
           // -------------------------------------------------------------------
+          libMesh::Real inv_density = 1./density);
           libMesh::Real sqr_density = (density * density);
           libMesh::Real sqr_u_momentum = u_momentum * u_momentum;
           libMesh::Real sqr_v_momentum = v_momentum * v_momentum;
@@ -769,6 +773,28 @@ namespace GRINS
           
           libMesh::Real lambda = -(2./3.)*_mu_qp;
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
+          
+            /* --- calculate viscosity tensor --- */
+          libMesh::Real tau_11, tau_12, tau_13, tau_21, tau_22, tau_23, tau_31, tau_32, tau_33;
+          
+          tau_11 = _mu_qp * ((4./3.)*(inv_density*grad_u_momentum(0) - (u_momentum/sqr_density)*grad_density(0)) - 
+                             (2./3.)*(inv_density*grad_v_momentum(1) - (v_momentum/sqr_density)*grad_density(1) + 
+                                      inv_density*grad_w_momentum(2) - (w_momentum/sqr_density)*grad_density(2)));
+          tau_12 = _mu_qp * (inv_density*grad_u_momentum(1) - (u_momentum/sqr_density)*grad_density(1) + 
+                             inv_density*grad_v_momentum(0) - (v_momentum/sqr_density)*grad_density(0));
+          tau_13 = _mu_qp * (inv_density*grad_u_momentum(2) - (u_momentum/sqr_density)*grad_density(2) + 
+                             inv_density*grad_w_momentum(0) - (w_momentum/sqr_density)*grad_density(0));
+          tau_21 = tau_12;
+          tau_22 = (2./3.)*_mu_qp * (2.*(inv_density*grad_v_momentum(1) - (v_momentum/sqr_density)*grad_density(1)) - 
+                                     inv_density*grad_u_momentum(0) + (u_momentum/sqr_density)*grad_density(0) - 
+                                     inv_density*grad_w_momentum(2) + (w_momentum/sqr_density)*grad_density(2));
+          tau_23 = _mu_qp * (inv_density*grad_w_momentum(1) - (w_momentum/sqr_density)*grad_density(1) +
+                             inv_density*grad_v_momentum(2) - (v_momentum/sqr_density)*grad_density(2)):
+          tau_31 = tau_13;
+          tau_32 = tau_23;
+          tau_33 = (2./3.)*_mu_qp * (2.*(inv_density*grad_w_momentum(2) - (w_momentum/sqr_density)*grad_density(2)) - 
+                                     inv_density*grad_u_momentum(0) + (u_momentum/sqr_density)*grad_density(0) - 
+                                     inv_density*grad_v_momentum(1) + (v_momentum/sqr_density)*grad_density(1));
                    
             /* --- calculate a1 matrix  --- */
           a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
@@ -844,6 +870,96 @@ namespace GRINS
           a3_energyrow(2) = a2_energyrow(3);
           a3_energyrow(3) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + sqr_v_momentum + 3.*sqr_w_momentum);
           a3_energyrow(4) = _gamma_qp*w_momentum/density;
+          
+            /* --- calculate b1 matrix --- */
+          b1_urow(0) = (1./sqr_density) * (mu_R*grad_u_momentum(0) + lambda*(grad_v_momentum(1)+grad_w_momentum(2)) - (mu_r/density)*(2.*u_momentum*grad_density(0) - v_momentum*grad_density(1) - w_momentum*grad_density(2)));
+          b1_urow(1) = (mu_R/sqr_density) * grad_density(0);
+          b1_urow(2) = (lambda/sqr_density) * grad_density(1);
+          b1_urow(3) = (lambda/sqr_density) * grad_density(2);
+          b1_urow(4) = 0.;
+          
+          b1_vrow(0) = (_mu_qp/sqr_density) * (grad_u_momentum(1) + grad_v_momentum(0) - ((2.*u_momentum)/density)*grad_density(1) - ((2.*v_momentum)/density)*grad_density(0));
+          b1_vrow(1) = (_mu_qp/sqr_density) * grad_density(1);
+          b1_vrow(2) = (_mu_qp/sqr_density) * grad_density(0);
+          b1_vrow(3) = 0.;
+          b1_vrow(4) = 0.;
+          
+          b1_wrow(0) = (_mu_qp/sqr_density) * (grad_u_momentum(2) + grad_w_momentum(0) - ((2.*u_momentum)/density)*grad_density(2) - ((2.*w_momentum)/density)*grad_density(0));
+          b1_wrow(1) = (_mu_qp/sqr_density) * grad_density(2);
+          b1_wrow(2) = 0.;
+          b1_wrow(3) = (_mu_qp/sqr_density) * grad_density(0);
+          b1_wrow(4) = 0.;
+          
+          b1_energyrow(0) = inv_density * ((u_momentum/density)*tau_11 + (v_momentum/density)*tau_12 + (w_momentum/density)*tau_13) +
+                            (u_momentum/density)*b1_urow(0) + (v_momentum/density)*b1_vrow(0) + (w_momentum/density)*b1_wrow(0)
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * (-grad_conserv_energy(0) + 
+                              ((2.*conserv_energy/density) - (3.*sqr_u_momentum/sqr_density) - (3.*sqr_v_momentum/sqr_density) - (3.*sqr_w_momentum/sqr_density))*grad_density(0) +
+                              (2.*u_momentum/density)*grad_u_momentum(0) + (2.*v_momentum/density)*grad_v_momentum(0) + (2.*w_momentum/density)*grad_w_momentum(0));
+          b1_energyrow(1) = (u_momentum/density)*b1_urow(1) + (v_momentum/density)*b1_vrow(1) + (w_momentum/density)*b1_wrow(1) - tau_11/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*u_momentum/density)*grad_density(0) - grad_u_momentum(0));
+          b1_energyrow(2) = (u_momentum/density)*b1_urow(2) + (v_momentum/density)*b1_vrow(2) + (w_momentum/density)*b1_wrow(2) - tau_12/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*v_momentum/density)*grad_density(0) - grad_v_momentum(0));
+          b1_energyrow(3) = (u_momentum/density)*b1_urow(3) + (v_momentum/density)*b1_vrow(3) + (w_momentum/density)*b1_wrow(3) - tau_13/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*w_momentum/density)*grad_density(0) - grad_w_momentum(0));
+          b1_energyrow(4) = ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * grad_density(0);
+          
+            /* --- calculate b2 matrix --- */
+          b2_urow(0) = b1_vrow(0);
+          b2_urow(1) = b1_vrow(1);
+          b2_urow(2) = b1_vrow(2);
+          b2_urow(3) = 0.;
+          b2_urow(4) = 0.;
+          
+          b2_vrow(0) = (1./sqr_density) * (lambda*(grad_u_momentum(0) + grad_w_momentum(2)) + mu_R*(grad_v_momentum(1) + (u_momentum/density)*grad_density(0) -
+                          (2.*v_momentum/density)*grad_density(1) + (w_momentum/density)*grad_density(2)));
+          b2_vrow(1) = (lambda/sqr_density)*grad_density(0);
+          b2_vrow(2) = (mu_R/sqr_density)*grad_density(1);
+          b2_vrow(3) = (lambda/sqr_density)*grad_density(2);
+          b2_vrow(4) = 0.;
+          
+          b2_wrow(0) = (_mu_qp/sqr_density) * (grad_v_momentum(2) + grad_w_momentum(1) - (2.*v_momentum/density)*grad_density(2) - (2.*w_momentum/density)*grad_density(1));
+          b2_wrow(1) = 0.;
+          b2_wrow(2) = (_mu_qp/sqr_density) * grad_density(2);
+          b2_wrow(3) = (_mu_qp/sqr_density) * grad_density(1);
+          b2_wrow(4) = 0.;
+          
+          b2_energyrow(0) = inv_density * ((u_momentum/density)*tau_21 + (v_momentum/density)*tau_22 + (w_momentum/density)*tau_23) +
+                            (u_momentum/density)*b2_urow(0) + (v_momentum/density)*b2_vrow(0) + (w_momentum/density)*b2_wrow(0)
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * (-grad_conserv_energy(1) + 
+                              ((2.*conserv_energy/density) - (3.*sqr_u_momentum/sqr_density) - (3.*sqr_v_momentum/sqr_density) - (3.*sqr_w_momentum/sqr_density))*grad_density(1) +
+                              (2.*u_momentum/density)*grad_u_momentum(1) + (2.*v_momentum/density)*grad_v_momentum(1) + (2.*w_momentum/density)*grad_w_momentum(1));
+          b2_energyrow(1) = (u_momentum/density)*b2_urow(1) + (v_momentum/density)*b2_vrow(1) + (w_momentum/density)*b2_wrow(1) - tau_21/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*u_momentum/density)*grad_density(1) - grad_u_momentum(1));
+          b2_energyrow(2) = (u_momentum/density)*b2_urow(2) + (v_momentum/density)*b2_vrow(2) + (w_momentum/density)*b2_wrow(2) - tau_22/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*v_momentum/density)*grad_density(1) - grad_v_momentum(1));
+          b2_energyrow(3) = (u_momentum/density)*b2_urow(3) + (v_momentum/density)*b2_vrow(3) + (w_momentum/density)*b2_wrow(3) - tau_23/density
+                            - ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * ((2.*w_momentum/density)*grad_density(1) - grad_w_momentum(1));
+          b2_energyrow(4) = ((_k_qp*_cp_qp)/(sqr_density*_gamma_qp)) * grad_density(1);
+          
+            /* --- calculate b3 matrix --- */
+          b3_urow(0) = 
+          b3_urow(1) = 
+          b3_urow(2) = 
+          b3_urow(3) = 
+          b3_urow(4) = 0.;
+          
+          b3_vrow(0) = 
+          b3_vrow(1) = 
+          b3_vrow(2) = 
+          b3_vrow(3) = 
+          b3_vrow(4) = 0.;
+          
+          b3_wrow(0) = 
+          b3_wrow(1) = 
+          b3_wrow(2) = 
+          b3_wrow(3) = 
+          b3_wrow(4) = 0.;
+          
+          b3_energyrow(0) = 
+          b3_energyrow(1) = 
+          b3_energyrow(2) = 
+          b3_energyrow(3) = 
+          b3_energyrow(4) =     
           
             /* --- calculate c11 matrix  --- */
           c11_urow(0) = -mu_R*u_momentum/sqr_density;
