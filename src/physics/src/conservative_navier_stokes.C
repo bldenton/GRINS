@@ -762,9 +762,9 @@ namespace GRINS
           libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
           
-          // -------------------------------------------------------------------
-          // Calculate jacobians (ai, bi & cij)
-          // -------------------------------------------------------------------
+          // ----------------------------------------------------------------------------------------
+          // Calculate jacobians (ai, bi & cij) Note: Be Consciouse of negative sign when using cij
+          // ----------------------------------------------------------------------------------------
           libMesh::Real inv_density = 1./density);
           libMesh::Real sqr_density = (density * density);
           libMesh::Real sqr_u_momentum = u_momentum * u_momentum;
