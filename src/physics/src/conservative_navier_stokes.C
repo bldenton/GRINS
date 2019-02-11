@@ -761,9 +761,10 @@ namespace GRINS
           libMesh::Real _k_qp = this-> _k(context, qp);
           libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
+          libMesh::Real _R_qp = _R;  
           
           // ----------------------------------------------------------------------------------------
-          // Calculate jacobians (ai, bi & cij) Note: Be Consciouse of negative sign when using cij
+          // Calculate jacobians (ai, bi & cij) Note: Be Conscious of negative sign when using cij
           // ----------------------------------------------------------------------------------------
           libMesh::Real inv_density = 1./density);
           libMesh::Real sqr_density = (density * density);
@@ -773,6 +774,11 @@ namespace GRINS
           
           libMesh::Real lambda = -(2./3.)*_mu_qp;
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
+          
+            /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real c_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
           
             /* --- calculate viscosity tensor --- */
           libMesh::Real tau_11, tau_12, tau_13, tau_21, tau_22, tau_23, tau_31, tau_32, tau_33;
