@@ -257,6 +257,22 @@ namespace GRINS
       const std::vector<std::vector<libMesh::Real> >& conserv_energy_phi = 
         context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_phi();
       
+      // ---------------------------------------------------------------------  
+      // Get Shape Function Gradients (in global coordiantes)
+      // @ interior quadrature points for each 
+      // ---------------------------------------------------------------------
+        /* --- Density   --- */
+      const std::vector<std::vector<libMesh::RealGradient> >& rho_gradphi = 
+        context.get_element_fe(this->_density_var.rho())->get_dphi();
+        
+        /* --- Momentum   --- */
+      const std::vector<std::vector<libMesh::RealGradient> >& momentum_gradphi = 
+        context.get_element_fe(this->_momentum_vars.rho_u())->get_dphi();
+        
+        /* --- Conservative Energy   --- */
+      const std::vector<std::vector<libMesh::RealGradient> >& conserv_energy_gradphi = 
+        context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_dphi();
+      
       // ---------------------------------------------------------------
       // Get the number of local degress of freedom in each variable
       // ---------------------------------------------------------------
@@ -292,14 +308,23 @@ namespace GRINS
       libMesh::DenseSubMatrix<libMesh::Real> &Mrho_u_rho_u = context.get_elem_jacobian(this->_momentum_vars.rho_u(), this->_momentum_vars.rho_u()); // R_{rho_u},{rho_u}        
       libMesh::DenseSubMatrix<libMesh::Real> &Mrho_v_rho_v = context.get_elem_jacobian(this->_momentum_vars.rho_v(), this->_momentum_vars.rho_v()); // R_{rho_v},{rho_v}       
       libMesh::DenseSubMatrix<libMesh::Real>* Mrho_w_rho_w = NULL;     
-      libMesh::DenseSubMatrix<libMesh::Real> &Menergy_energy = context.get_elem_jacobian(this->_conserv_energy_var.conserv_energy(), this->_conserv_energy_var.conserv_energy()); // R_{conserv_energy},{conserv_energy}         
+      libMesh::DenseSubMatrix<libMesh::Real> &Menergy_energy = context.get_elem_jacobian(this->_conserv_energy_var.conserv_energy(), this->_conserv_energy_var.conserv_energy()); // R_{conserv_energy},{conserv_energy} 
       
       if (this -> _momentum_vars.dim() == 3)
         {
           Frho_w = &context.get_elem_residual(this->_momentum_vars.rho_w());      // R_{row_w}
           Mrho_w_rho_w = &context.get_elem_jacobian(this->_momentum_vars.rho_w(), this->_momentum_vars.rho_w()); // R_{rho_w},{rho_w}
         }
-      
+ 
+      // ---------------------------------------------------------------------------------------------------------
+      // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
+      // ---------------------------------------------------------------------------------------------------------
+      libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
+      libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
+                                            a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
+                                            a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.);
+      libMesh::DenseVector<libMesh::Number> dUdt(5, 0.);
+   
       // ---------------------------------------------------------------
       // Get the number of element quadrature points
       // ---------------------------------------------------------------
@@ -326,11 +351,181 @@ namespace GRINS
           
           if (this -> _momentum_vars.dim() == 3)
             context.interior_rate(this -> _momentum_vars.rho_w(), qp, rho_w_dot);
+
+          // --------------------------------------------------
+          // Compute the Solutions at the Old Newton Iteration
+          // --------------------------------------------------
+          libMesh::Number density, u_momentum, v_momentum, w_momentum, conserv_energy;
+          
+            /* --- Density Value at Quadrature Point --- */
+          density = context.interior_value(this->_density_var.rho(), qp);
+          
+            /* --- Momentum Values at Quadrature Point --- */
+          u_momentum = context.interior_value(this->_momentum_vars.rho_u(), qp);
+          v_momentum = context.interior_value(this->_momentum_vars.rho_v(), qp);
+          if (this->_momentum_vars.dim() == 3)
+            w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
+            
+            /* --- Conservative Energy Value at Quadrature Point --- */
+          conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);
+          
+          // -----------------------------------------------------------
+          // Compute the Solution Gradients at the Old Newton Iteration
+          // -----------------------------------------------------------
+          libMesh::Gradient grad_density, grad_u_momentum, grad_v_momentum, grad_w_momentum, grad_conserv_energy;
+          
+            /* --- Density Gradietn at Quadrature Point --- */
+          grad_density = context.interior_gradient(this->_density_var.rho(), qp);           // grad(density)
+          
+            /* --- Momentum Gradient at Quadrature Point --- */
+          grad_u_momentum = context.interior_gradient(this->_momentum_vars.rho_u(), qp);    // grad(u_momentum)
+          grad_v_momentum = context.interior_gradient(this->_momentum_vars.rho_v(), qp);    // grad(v_momentum)
+          if (this->_momentum_vars.dim() == 3)
+            grad_w_momentum = context.interior_gradient(this->_momentum_vars.rho_w(), qp);  // grad(w_momentum)
+            
+            /* --- Conservative Energy at Quadrature Point --- */
+          grad_conserv_energy = context.interior_gradient(this->_conserv_energy_var.conserv_energy(), qp);  // grad(conserv_energy)
+          
+          // -------------------------------------------------------------------
+          // Compute Viscoity and Thermal Conductivity at this Quadrature Point
+          // -------------------------------------------------------------------
+          libMesh::Real _mu_qp = this ->_mu(context, qp);
+          libMesh::Real _k_qp = this-> _k(context, qp);
+          libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
+          libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
+          libMesh::Real _R_qp = _R;
+          
+            /* --- Declare flow aligned length scale variable --- */
+          libMesh::Real hvel_qp, stabSUPG_rho, stabSUPG_momentum, stabSUPG_energy;
+          
+            /* --- Time Step Assumed to be 1.  --- */
+          libMesh::Number dtime = 1.;
+          
+          // ----------------------------------------------------------------------------------------
+          // Calculate jacobian ai
+          // ----------------------------------------------------------------------------------------
+          libMesh::Real inv_density = 1./density);
+          libMesh::Real sqr_density = (density * density);
+          libMesh::Real sqr_u_momentum = u_momentum * u_momentum;
+          libMesh::Real sqr_v_momentum = v_momentum * v_momentum;
+          libMesh::Real sqr_w_momentum = (this->_momentum_vars.dim() == 3)?(w_momentum*w_momentum):0;
+          
+          libMesh::Real lambda = -(2./3.)*_mu_qp;
+          libMesh::Real mu_R = 2.*_mu_qp + lambda;
+          
+            /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
+          
+            /* --- Calculate Velocity Vector  ---*/  
+          libMesh::Number velocity_vec_length;
+          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          unit_velocity(0) = u_momentum / velocity_vec_length;
+          unit_velocity(1) = v_momentum / velocity_vec_length;
+          unit_velocity(2) = w_momentum / velocity_vec_length;            
+            
+            /* --- calculate a1 matrix  --- */
+          a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
+          a1_urow(1) = (3. - _gamma_qp) * u_momentum/density;
+          a1_urow(2) = (1. - _gamma_qp) * v_momentum/density;
+          a1_urow(3) = (1. - _gamma_qp) * w_momentum/density;
+          a1_urow(4) = (_gamma_qp - 1.);
+          
+          a1_vrow(0) = -u_momentum * v_momentum / sqr_density;
+          a1_vrow(1) = v_momentum / density;
+          a1_vrow(2) = u_momentum / density;
+          a1_vrow(3) = 0.;
+          a1_vrow(4) = 0.;
+          
+          a1_wrow(0) = -u_momentum * w_momentum / sqr_density;
+          a1_wrow(1) = w_momentum / density;
+          a1_wrow(2) = 0.;
+          a1_wrow(3) = u_momentum / density;
+          a1_wrow(4) = 0.;
+          
+          a1_energyrow(0) = (-_gamma_qp*conserv_energy*u_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*u_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a1_energyrow(1) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(3.*sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a1_energyrow(2) = (1.-_gamma_qp)*u_momentum*v_momentum/sqr_density;
+          a1_energyrow(3) = (1.-_gamma_qp)*u_momentum*w_momentum/sqr_density;
+          a1_energyrow(4) = _gamma_qp*u_momentum/density;
+          
+            /* --- calculate a2 matrix  --- */
+          a2_urow(0) = -u_momentum * v_momentum / sqr_density;
+          a2_urow(1) = v_momentum / density;
+          a2_urow(2) = u_momentum / density;
+          a2_urow(3) = 0.;
+          a2_urow(4) = 0.;
+          
+          a2_vrow(0) = (_gamma_qp - 3.) * sqr_v_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_w_momentum);
+          a2_vrow(1) = (1. - _gamma_qp) * u_momentum / density;
+          a2_vrow(2) = (3. - _gamma_qp) * v_momentum / density;
+          a2_vrow(3) = (1. - _gamma_qp) * w_momentum / density;
+          a2_vrow(4) = (_gamma_qp - 1.);
+          
+          a2_wrow(0) = -v_momentum * w_momentum / sqr_density;
+          a2_wrow(1) = 0.;
+          a2_wrow(2) = w_momentum / density;
+          a2_wrow(3) = v_momentum / density;
+          a2_wrow(4) = 0.;
+          
+          a2_energyrow(0) = (-_gamma_qp*conserv_energy*v_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*v_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a2_energyrow(1) = a1_energyrow(2);
+          a2_energyrow(2) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + 3.*sqr_v_momentum + sqr_w_momentum);
+          a2_energyrow(3) = (1.-_gamma_qp)*v_momentum*w_momentum/sqr_density;
+          a2_energyrow(4) = _gamma_qp*v_momentum/density;
+          
+            /* ---  calculate a3 matrix  --- */
+          a3_urow(0) = -u_momentum * w_momentum / sqr_density;
+          a3_urow(1) = w_momentum / density;
+          a3_urow(2) = 0.;
+          a3_urow(3) = u_momentum / density;
+          a3_urow(4) = 0.;
+          
+          a3_vrow(0) = -v_momentum * w_momentum / sqr_density;
+          a3_vrow(1) = 0.;
+          a3_vrow(2) = w_momentum / density;
+          a3_vrow(3) = v_momentum / density;
+          a3_vrow(4) = 0.;
+          
+          a3_wrow(0) = (_gamma_qp - 3.) * sqr_w_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_u_momentum * sqr_v_momentum);
+          a3_wrow(1) = (1. - _gamma_qp) * u_momentum / density;
+          a3_wrow(2) = (1. - _gamma_qp) * v_momentum / density;
+          a3_wrow(3) = (3. - _gamma_qp) * w_momentum / density;
+          a3_wrow(4) = (_gamma_qp - 1.); 
+          
+          a3_energyrow(0) = (-_gamma_qp*conserv_energy*w_momentum/sqr_density) + ((_gamma_qp - 1.)/(sqr_density*density))*w_momentum*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum);
+          a3_energyrow(1) = a1_energyrow(3);
+          a3_energyrow(2) = a2_energyrow(3);
+          a3_energyrow(3) = (_gamma_qp*conserv_energy/density) + ((1.-_gamma_qp)/(2.*sqr_density))*(sqr_u_momentum + sqr_v_momentum + 3.*sqr_w_momentum);
+          a3_energyrow(4) = _gamma_qp*w_momentum/density;            
+ 
+         // Set up dUdt vector
+         dUdt(0) = rho_dot;
+         dUdt(1) = rho_u_dot;
+         dUdt(2) = rho_v_dot;
+         dUdt(3) = rho_w_dot;
+         dUdt(4) = energy_dot;
           
           /* ---  perform integration  --- */
           for (unsigned int ii = 0; ii != n_rho_dofs; ++ii)
             {
-              Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp] * rho_dot;
+               // Calculate flow aligned element length scale
+              hvel_qp = 2./(abs(unit_velocity.dot(rho_gradphi[ii][qp])));
+              
+              // Calculate density SUPG Stabilization Factor
+              stabSUPG_rho = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
+            
+              Frho(ii) -= JxW_density[qp] * 
+                          // Conservative Navier-Stokes
+                          (rho_phi[ii][qp] * rho_dot
+                          //SUPG Stabilization
+                          + stabSUPG_rho *
+                          (rho_gradphi[ii][qp](0) * rho_u_dot +
+                           rho_gradphi[ii][qp](1) * rho_v_dot +
+                           rho_gradphi[ii][qp](2) * rho_w_dot)
+                          );
               
               if(std::isnan(Frho(ii)))
                 { mass_r << "--- mass_residual() ---" << "\n";
@@ -347,11 +542,42 @@ namespace GRINS
           
           for (unsigned int ii = 0; ii != n_rho_u_dofs; ++ii)
             {
-              Frho_u(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_u_dot;
-              Frho_v(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_v_dot;
+              // Calculate Flow Aligned Length Scale
+              hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
+              
+              // Calculate SUPG Momentum Stabilization Factor
+              stabSUPG_momentum = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_mu_qp)/(density*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              
+              Frho_u(ii) -= JxW_momentum[qp] * 
+                            // Conservative Navier-Stokes
+                            (momentum_phi[ii][qp] * rho_u_dot
+                            // SUPG Stabilization
+                            + stab_SUPG_momentum *
+                            (momentum_gradphi[ii][qp](0) * a1_urow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](1) * a2_urow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](2) * a3_urow.dot(dUdt))
+                            );
+                            
+              Frho_v(ii) -= JxW_momentum[qp] * 
+                            // Conservative Navier-Stokes
+                            (momentum_phi[ii][qp] * rho_v_dot
+                             // SUPG Stabilization
+                             + stab_SUPG_momentum *
+                            (momentum_gradphi[ii][qp](0) * a1_vrow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](1) * a2_vrow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](2) * a3_vrow.dot(dUdt))                           
+                            );
               
               if ( this -> _momentum_vars.dim() == 3)
-              (*Frho_w)(ii) -= JxW_momentum[qp] * momentum_phi[ii][qp] * rho_w_dot;
+              (*Frho_w)(ii) -= JxW_momentum[qp] * 
+                            // Conservative Navier-Stokes
+                            (momentum_phi[ii][qp] * rho_w_dot
+                             // SUPG Stabilization
+                             + stab_SUPG_momentum *
+                            (momentum_gradphi[ii][qp](0) * a1_wrow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](1) * a2_wrow.dot(dUdt) +
+                             momentum_gradphi[ii][qp](2) * a3_wrow.dot(dUdt))                             
+                            );
               
               if(std::isnan(Frho_u(ii)))
                 { mass_r << "--- mass_residual() ---" << "\n";
@@ -391,7 +617,21 @@ namespace GRINS
             
           for (unsigned int ii = 0; ii != n_conserv_energy_dofs; ++ii)
             {
-              Fconserv_energy(ii) -= JxW_energy[qp] * conserv_energy_phi[ii][qp] * energy_dot;
+              // Calculate Flow Aligned Length Scale
+              hvel_qp = 2./(abs(unit_velocity.dot(conserv_energy_gradphi[ii][qp])));
+              
+              // Calculate SUPG Momentum Stabilization Factor
+              stabSUPG_energy = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_k_qp)/(density*_cp_qp*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              
+              Fconserv_energy(ii) -= JxW_energy[qp] * 
+                        // Conservative Navier-Stokes
+                        (conserv_energy_phi[ii][qp] * energy_dot
+                        // SUPG Stabilization
+                        + stab_SUPG_energy *
+                        (conserv_energy_gradphi[ii][qp](0) * a1_energyrow.dot(dUdt) +
+                         conserv_energy_gradphi[ii][qp](1) * a2_energyrow.dot(dUdt) +
+                         conserv_energy_gradphi[ii][qp](2) * a3_energyrow.dot(dUdt))                        
+                        );
               
               if(std::isnan(Fconserv_energy(ii)))
                 { mass_r << "--- mass_residual() ---" << "\n";
@@ -485,15 +725,41 @@ namespace GRINS
       // ------------------------------------------------------------------------
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         {
+          // -------------------------------------------------------------------
+          // Compute Viscoity and Thermal Conductivity at this Quadrature Point
+          // -------------------------------------------------------------------
+          libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
+          libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
+          libMesh::Real _R_qp = _R; 
+        
           // --------------------------------------------------------------------
           // Compute the Solution & its gradients at the Old Newton Iteration
           // --------------------------------------------------------------------
             /* ---  Solution  --- */
-          libMesh::Number u_momentum, v_momentum, w_momentum;
+          libMesh::Number density, u_momentum, v_momentum, w_momentum, conserv_energy;
+          density = context.interior_value(this->_density_var.rho(), qp);
           u_momentum = context.interior_value(this->_momentum_vars.rho_u(), qp);
           v_momentum = context.interior_value(this->_momentum_vars.rho_v(), qp);
           if (this->_momentum_vars.dim() == 3)
             w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
+          conserv_energy = context.interior_value(this->_conser_energy_var.conserv_energy(), qp);          
+          
+            /* --- Calculate Velocity Vector  ---*/  
+          libMesh::Number velocity_vec_length, sqr_density, sqr_u_momentum, sqr_v_momentum, sqr_w_momentum;
+          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          sqr_density = density * density;
+          sqr_u_momentum = u_momentum * u_momentum;
+          sqr_v_momentum = v_momentum * v_momentum;
+          sqr_w_momentum = w_momentum * w_momentum;
+          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          unit_velocity(0) = u_momentum / velocity_vec_length;
+          unit_velocity(1) = v_momentum / velocity_vec_length;
+          unit_velocity(2) = w_momentum / velocity_vec_length;
+          
+            /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);          
           
             /* --- Gradients  --- */
           libMesh::Gradient grad_u_momentum, grad_v_momentum, grad_w_momentum;
@@ -508,24 +774,42 @@ namespace GRINS
           if (this->_momentum_vars.dim() == 3)
             const libMesh::Number  grad_z_momentum_z = grad_w_momentum(2);  // If 3D Domain
           
+          // Flow Aligned Length Scale
+          libMesh::Number hvel_qp, stabSUPG_rho;
+          
+          // Time Step Assumed to be 1.
+          libMesh::Number dtime = 1.;
+          
           // ------------------------------------------------------------
           // Loop over the density degrees of freedom
           // This computes the contributions of the continuity equation
           // ------------------------------------------------------------
           for (unsigned ii=0; ii != n_rho_dofs; ii++)
             {
-              Frho(ii) -= JxW_density[qp] * rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z);
+              // Calculate flow aligned element length scale
+              hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
+              
+              // Calculate density SUPG Stabilization Factor
+              stabSUPG_rho = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+            
+              Frho(ii) -= JxW_density[qp] * 
+                          // Conservative Navier-Stokes
+                          (rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z) +
+                          // SUPG Stabilization
+                          stabSUPG * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z)
+                          );
               
               if(std::isnan(Frho(ii)))
-                { std::cout << "--- assemble_mass_time_derivative() ---" << "\n";
-                  std::cout << "Frho(ii) = " << Frho(ii) << "\n";
-                  std::cout << "ii = " << ii << "\n";
-                  std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
-                  std::cout << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
-                  std::cout << "grad_u_momentum_x = " << grad_u_momentum_x << "\n";
-                  std::cout << "grad_v_momentum_y = " << grad_v_momentum_y << "\n";
-                  std::cout << "grad_w_momentum_z = " << grad_w_momentum_z << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { std::cout << "--- assemble_mass_time_derivative() ---" << "\n"
+                            << "Frho(ii) = " << Frho(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_density[qp] = " << JxW_density[qp] << "\n"
+                            << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n"
+                            << "grad_u_momentum_x = " << grad_u_momentum_x << "\n"
+                            << "grad_v_momentum_y = " << grad_v_momentum_y << "\n"
+                            << "grad_w_momentum_z = " << grad_w_momentum_z << "\n"
+                            << "stabSUPG = " << stabSUPG_rho << "\n"
+                            << " -----------------------" << "\n";
                 }
               
               /* if (compute_jacobian)
@@ -709,6 +993,7 @@ namespace GRINS
       libMesh::DenseVector<libMesh::Number> d_dx_rho(5, 0.), d_dx_umomentum(5, 0.), d_dx_vmomentum(5, 0.), d_dx_wmomentum(5, 0.), d_dx_conserv_energy(5, 0.),
                                             d_dy_rho(5, 0.), d_dy_umomentum(5, 0.), d_dy_vmomentum(5, 0.), d_dy_wmomentum(5, 0.), d_dy_conserv_energy(5, 0.),
                                             d_dz_rho(5, 0.), d_dz_umomentum(5, 0.), d_dz_vmomentum(5, 0.), d_dz_wmomentum(5, 0.), d_dz_conserv_energy(5, 0.);
+      libMesh::DenseVector<libMesh::Number> NS_stab_u(5, 0.), NS_stab_v(5, 0.), NS_stab_w(5, 0.), NS_stab_energy(5, 0.);
       
       // -------------------------------------------------------------------------------------------------------------------------------------------------           
       // Loop over Quadrature Points and assemble
@@ -724,9 +1009,6 @@ namespace GRINS
           
             /* --- Density Value at Quadrature Point --- */
           density = context.interior_value(this->_density_var.rho(), qp);
-          
-          //if ( density == 0.0 ) 
-          //  { density = _rho_initial; }
           
             /* --- Momentum Values at Quadrature Point --- */
           u_momentum = context.interior_value(this->_momentum_vars.rho_u(), qp);
@@ -761,7 +1043,13 @@ namespace GRINS
           libMesh::Real _k_qp = this-> _k(context, qp);
           libMesh::Real _cp_qp = this-> _cp();    //_cp(context, qp);
           libMesh::Real _gamma_qp = _gamma;  //this -> _gamma(context, qp);
-          libMesh::Real _R_qp = _R;  
+          libMesh::Real _R_qp = _R;
+          
+            /* --- Declare flow aligned length scale variable --- */
+          libMesh::Real hvel_qp, stabSUPG_momentum, stabSUPG_energy;
+          
+            /* --- Time Step Assumed to be 1.  --- */
+          libMesh::Number dtime = 1.;
           
           // ----------------------------------------------------------------------------------------
           // Calculate jacobians (ai, bi & cij) Note: Be Conscious of negative sign when using cij
@@ -778,7 +1066,15 @@ namespace GRINS
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
           libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real c_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
+          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
+          
+            /* --- Calculate Velocity Vector  ---*/  
+          libMesh::Number velocity_vec_length;
+          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          unit_velocity(0) = u_momentum / velocity_vec_length;
+          unit_velocity(1) = v_momentum / velocity_vec_length;
+          unit_velocity(2) = w_momentum / velocity_vec_length;
           
             /* --- calculate viscosity tensor --- */
           libMesh::Real tau_11, tau_12, tau_13, tau_21, tau_22, tau_23, tau_31, tau_32, tau_33;
@@ -1230,12 +1526,37 @@ namespace GRINS
           // ------------------------------------------------------------------
           for (unsigned int ii=0; ii != n_rho_u_dofs; ii++)
             {
+              // Calculate Flow Aligned Length Scale
+              hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
+              
+              // Calculate SUPG Momentum Stabilization Factor
+              stabSUPG_momentum = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_mu_qp)/(density*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              
+              // Calculate U-Momentum Navier-Stokes Solution for Stabilization
+              NS_stab_u = (a1_urow.add(1., b1_urow)).dot(dUdx) + (a2_urow.add(1., b2_urow)).dot(dUdy) + (a3_urow.add(1., b3_urow)).dot(dUdz) 
+                          - c11_urow.dot(momementum_gradphi[ii][qp](0)*dUdx)
+                          - c12_urow.dot(momementum_gradphi[ii][qp](0)*dUdy)
+                          - c13_urow.dot(momementum_gradphi[ii][qp](0)*dUdz)
+                          - c21_urow.dot(momementum_gradphi[ii][qp](1)*dUdx)
+                          - c22_urow.dot(momementum_gradphi[ii][qp](1)*dUdy)
+                          - c23_urow.dot(momementum_gradphi[ii][qp](1)*dUdz)
+                          - c31_urow.dot(momementum_gradphi[ii][qp](2)*dUdx)
+                          - c32_urow.dot(momementum_gradphi[ii][qp](2)*dUdy)
+                          - c33_urow.dot(momementum_gradphi[ii][qp](2)*dUdz);
+              
               // F{rho_u}
               Frho_u(ii) -= JxW_momentum[qp] * 
-                    (momentum_phi[ii][qp] * (a1_urow.dot(dUdx) + a2_urow.dot(dUdy) + a3_urow.dot(dUdz)) +            // inviscid interaction portions
+                    // Conservative Navier-Stokes
+                    (momentum_phi[ii][qp] * (a1_urow.dot(dUdx) + a2_urow.dot(dUdy) + a3_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](0) * (c11_urow.dot(dUdx) + c12_urow.dot(dUdy) + c13_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](1) * (c21_urow.dot(dUdx) + c22_urow.dot(dUdy) + c23_urow.dot(dUdz)) +
-                    momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz))
+                    momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz)) 
+                    // SUPG Stabilization
+                    + stabSUPG_momentum * 
+                    ((momentum_gradphi[ii][qp](0) * a1_urow.dot(NS_stab_u)) +
+                     (momentum_gradphi[ii][qp](1) * a2_urow.dot(NS_stab_u)) +
+                     (momentum_gradphi[ii][qp](2) * a3_urow.dot(NS_stab_u)))
+                    // Shock Capturing Operator -- IN Process
                     );
                     
               if(std::isnan(Frho_u(ii)))
@@ -1315,13 +1636,32 @@ namespace GRINS
                   
                   std::cout << " -----------------------" << "\n";
                 }
+
+              // Calculate V-Momentum Navier-Stokes Solution for Stabilization
+              NS_stab_v = (a1_vrow.add(1., b1_vrow)).dot(dUdx) + (a2_vrow.add(1., b2_vrow)).dot(dUdy) + (a3_vrow.add(1., b3_vrow)).dot(dUdz) 
+                          - c11_vrow.dot(momementum_gradphi[ii][qp](0)*dUdx)
+                          - c12_vrow.dot(momementum_gradphi[ii][qp](0)*dUdy)
+                          - c13_vrow.dot(momementum_gradphi[ii][qp](0)*dUdz)
+                          - c21_vrow.dot(momementum_gradphi[ii][qp](1)*dUdx)
+                          - c22_vrow.dot(momementum_gradphi[ii][qp](1)*dUdy)
+                          - c23_vrow.dot(momementum_gradphi[ii][qp](1)*dUdz)
+                          - c31_vrow.dot(momementum_gradphi[ii][qp](2)*dUdx)
+                          - c32_vrow.dot(momementum_gradphi[ii][qp](2)*dUdy)
+                          - c33_vrow.dot(momementum_gradphi[ii][qp](2)*dUdz);
               
               // F{rho_v}     
               Frho_v(ii) -= JxW_momentum[qp] * 
-                    (momentum_phi[ii][qp] * (a1_vrow.dot(dUdx) + a2_vrow.dot(dUdy) + a3_vrow.dot(dUdz)) +            // inviscid interaction portions
+                    // Conservative Navier-Stokes
+                    (momentum_phi[ii][qp] * (a1_vrow.dot(dUdx) + a2_vrow.dot(dUdy) + a3_vrow.dot(dUdz)) + 
                     momentum_gradphi[ii][qp](0) * (c11_vrow.dot(dUdx) + c12_vrow.dot(dUdy) + c13_vrow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](1) * (c21_vrow.dot(dUdx) + c22_vrow.dot(dUdy) + c23_vrow.dot(dUdz)) +
-                    momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz))
+                    momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz)) 
+                    // SUPG Stabilization
+                    + stabSUPG_momentum * 
+                    ((momentum_gradphi[ii][qp](0) * a1_vrow.dot(NS_stab_v)) +
+                     (momentum_gradphi[ii][qp](1) * a2_vrow.dot(NS_stab_v)) +
+                     (momentum_gradphi[ii][qp](2) * a3_vrow.dot(NS_stab_v)))
+                    // Shock Capturing Operator -- IN Process
                     );
                     
               if(std::isnan(Frho_v(ii)))
@@ -1337,12 +1677,32 @@ namespace GRINS
                     
               if (this->_momentum_vars.dim() == 3)
                 {
+                  // Calculate W-Momentum Navier-Stokes Solution for Stabilization
+                  NS_stab_w = (a1_wrow.add(1., b1_wrow)).dot(dUdx) + (a2_wrow.add(1., b2_wrow)).dot(dUdy) + (a3_wrow.add(1., b3_wrow)).dot(dUdz) 
+                          - c11_wrow.dot(momementum_gradphi[ii][qp](0)*dUdx)
+                          - c12_wrow.dot(momementum_gradphi[ii][qp](0)*dUdy)
+                          - c13_wrow.dot(momementum_gradphi[ii][qp](0)*dUdz)
+                          - c21_wrow.dot(momementum_gradphi[ii][qp](1)*dUdx)
+                          - c22_wrow.dot(momementum_gradphi[ii][qp](1)*dUdy)
+                          - c23_wrow.dot(momementum_gradphi[ii][qp](1)*dUdz)
+                          - c31_wrow.dot(momementum_gradphi[ii][qp](2)*dUdx)
+                          - c32_wrow.dot(momementum_gradphi[ii][qp](2)*dUdy)
+                          - c33_wrow.dot(momementum_gradphi[ii][qp](2)*dUdz);
+                
+                
                   // F{rho_w}
                   (*Frho_w)(ii) -= JxW_momentum[qp] *
-                      (momentum_phi[ii][qp] * (a1_wrow.dot(dUdx) + a2_wrow.dot(dUdy) + a3_wrow.dot(dUdz)) +          // inviscid interaction portions
+                      // Conservative Navier-Stokes
+                      (momentum_phi[ii][qp] * (a1_wrow.dot(dUdx) + a2_wrow.dot(dUdy) + a3_wrow.dot(dUdz)) + 
                       momentum_gradphi[ii][qp](0) * (c11_wrow.dot(dUdx) + c12_wrow.dot(dUdy) + c13_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](1) * (c21_wrow.dot(dUdx) + c22_wrow.dot(dUdy) + c23_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
+                      // SUPG Stabilization
+                      + stabSUPG_momentum * 
+                      ((momentum_gradphi[ii][qp](0) * a1_wrow.dot(NS_stab_w)) +
+                       (momentum_gradphi[ii][qp](1) * a2_wrow.dot(NS_stab_w)) +
+                       (momentum_gradphi[ii][qp](2) * a3_wrow.dot(NS_stab_w)))
+                      // Shock Capturing Operator -- IN Process                      
                       );
                       
                   if(std::isnan((*Frho_w)(ii)))
@@ -1482,12 +1842,37 @@ namespace GRINS
             
           for (unsigned int ii=0; ii != n_conserv_energy_dofs; ii++)
             {
+              // Calculate Flow Aligned Length Scale
+              hvel_qp = 2./(abs(unit_velocity.dot(conserv_energy_gradphi[ii][qp])));
+              
+              // Calculate SUPG Momentum Stabilization Factor
+              stabSUPG_energy = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_k_qp)/(density*_cp_qp*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              
+              // Calculate Conservative Energy Navier-Stokes Solution for Stabilization
+              NS_stab_energy = (a1_energyrow.add(1., b1_energyrow)).dot(dUdx) + (a2_energyrow.add(1., b2_energyrow)).dot(dUdy) + (a3_energyrow.add(1., b3_energyrow)).dot(dUdz) 
+                              - c11_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdx)
+                              - c12_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdy)
+                              - c13_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdz)
+                              - c21_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdx)
+                              - c22_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdy)
+                              - c23_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdz)
+                              - c31_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdx)
+                              - c32_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdy)
+                              - c33_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdz);
+            
               // F{conserv_energy}
-              Fconserv_energy(ii) -= JxW_energy[qp] * 
-                    (conserv_energy_phi[ii][qp] * (a1_energyrow.dot(dUdx) + a2_energyrow.dot(dUdy) + a3_energyrow.dot(dUdz)) +            // inviscid interaction portions
+              Fconserv_energy(ii) -= JxW_energy[qp] *
+                    // Conservative Navier-Stokes
+                    (conserv_energy_phi[ii][qp] * (a1_energyrow.dot(dUdx) + a2_energyrow.dot(dUdy) + a3_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](0) * (c11_energyrow.dot(dUdx) + c12_energyrow.dot(dUdy) + c13_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow.dot(dUdx) + c22_energyrow.dot(dUdy) + c23_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
+                    // SUPG Stabilization
+                    + stabSUPG_energy * 
+                    ((conserv_energy_gradphi[ii][qp](0) * a1_energyrow.dot(NS_stab_energy)) +
+                     (conserv_energy_gradphi[ii][qp](1) * a2_energyrow.dot(NS_stab_energy)) +
+                     (conserv_energy_gradphi[ii][qp](2) * a3_energyrow.dot(NS_stab_energy)))
+                    // Shock Capturing Operator -- IN Process  
                     );    
                     
               if(std::isnan(Fconserv_energy(ii)))
