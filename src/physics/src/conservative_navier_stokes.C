@@ -512,7 +512,7 @@ namespace GRINS
           for (unsigned int ii = 0; ii != n_rho_dofs; ++ii)
             {
                // Calculate flow aligned element length scale
-              hvel_qp = 2./(abs(unit_velocity.dot(rho_gradphi[ii][qp])));
+              hvel_qp = 2./(abs(unit_velocity.dot(rho_gradphi[ii][qp]() )));
               
               // Calculate density SUPG Stabilization Factor
               stab_SUPG_rho = pow((pow(2./dtime, 2.) + pow(((2.*(velocity_vec_length + a_qp)) / hvel_qp), 2.)), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
@@ -751,7 +751,7 @@ namespace GRINS
           sqr_u_momentum = u_momentum * u_momentum;
           sqr_v_momentum = v_momentum * v_momentum;
           sqr_w_momentum = w_momentum * w_momentum;
-          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           unit_velocity(0) = u_momentum / velocity_vec_length;
           unit_velocity(1) = v_momentum / velocity_vec_length;
           unit_velocity(2) = w_momentum / velocity_vec_length;
