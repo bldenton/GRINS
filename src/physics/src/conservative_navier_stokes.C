@@ -324,6 +324,7 @@ namespace GRINS
                                             a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
                                             a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.);
       libMesh::DenseVector<libMesh::Number> dUdt(5, 0.);
+      libMesh::DenseVector<libMesh::Number> rho_dphi(3, 0.), momentum_dphi(3, 0.), energy_dphi(3, 0.);
    
       // ---------------------------------------------------------------
       // Get the number of element quadrature points
@@ -511,8 +512,12 @@ namespace GRINS
           /* ---  perform integration  --- */
           for (unsigned int ii = 0; ii != n_rho_dofs; ++ii)
             {
-               // Calculate flow aligned element length scale
-              hvel_qp = 2./(abs(unit_velocity.dot(rho_gradphi[ii][qp]() )));
+              // Calculate flow aligned element length scale
+              rho_dphi(0) = rho_gradphi[ii][qp](0);
+              rho_dphi(1) = rho_gradphi[ii][qp](1);
+              rho_dphi(2) = rho_gradphi[ii][qp](2);
+              
+              hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
               
               // Calculate density SUPG Stabilization Factor
               stab_SUPG_rho = pow((pow(2./dtime, 2.) + pow(((2.*(velocity_vec_length + a_qp)) / hvel_qp), 2.)), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
@@ -543,7 +548,11 @@ namespace GRINS
           for (unsigned int ii = 0; ii != n_rho_u_dofs; ++ii)
             {
               // Calculate Flow Aligned Length Scale
-              hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
+              momentum_dphi(0) = momentum_gradphi[ii][qp](0);
+              momentum_dphi(1) = momentum_gradphi[ii][qp](1);
+              momentum_dphi(2) = momentum_gradphi[ii][qp](2);
+              
+              hvel_qp = 2./(abs(unit_velocity.dot(momentum_dphi)));
               
               // Calculate SUPG Momentum Stabilization Factor
               stab_SUPG_momentum = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
@@ -618,7 +627,11 @@ namespace GRINS
           for (unsigned int ii = 0; ii != n_conserv_energy_dofs; ++ii)
             {
               // Calculate Flow Aligned Length Scale
-              hvel_qp = 2./(abs(unit_velocity.dot(conserv_energy_gradphi[ii][qp])));
+              energy_dphi(0) = conserv_energy_gradphi[ii][qp](0);
+              energy_dphi(1) = conserv_energy_gradphi[ii][qp](1);
+              energy_dphi(2) = conserv_energy_gradphi[ii][qp](2);
+              
+              hvel_qp = 2./(abs(unit_velocity.dot(energy_dphi)));
               
               // Calculate SUPG Momentum Stabilization Factor
               stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
