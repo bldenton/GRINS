@@ -742,7 +742,7 @@ namespace GRINS
           v_momentum = context.interior_value(this->_momentum_vars.rho_v(), qp);
           if (this->_momentum_vars.dim() == 3)
             w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
-          conserv_energy = context.interior_value(this->_conser_energy_var.conserv_energy(), qp);          
+          conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);          
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length, sqr_density, sqr_u_momentum, sqr_v_momentum, sqr_w_momentum;
@@ -808,7 +808,7 @@ namespace GRINS
                             << "grad_u_momentum_x = " << grad_u_momentum_x << "\n"
                             << "grad_v_momentum_y = " << grad_v_momentum_y << "\n"
                             << "grad_w_momentum_z = " << grad_w_momentum_z << "\n"
-                            << "stabSUPG = " << stabSUPG_rho << "\n"
+                            << "stabSUPG = " << stab_SUPG_rho << "\n"
                             << " -----------------------" << "\n";
                 }
               
@@ -1091,7 +1091,7 @@ namespace GRINS
                                      inv_density*grad_u_momentum(0) + (u_momentum/sqr_density)*grad_density(0) - 
                                      inv_density*grad_w_momentum(2) + (w_momentum/sqr_density)*grad_density(2));
           tau_23 = _mu_qp * (inv_density*grad_w_momentum(1) - (w_momentum/sqr_density)*grad_density(1) +
-                             inv_density*grad_v_momentum(2) - (v_momentum/sqr_density)*grad_density(2)):
+                             inv_density*grad_v_momentum(2) - (v_momentum/sqr_density)*grad_density(2));
           tau_31 = tau_13;
           tau_32 = tau_23;
           tau_33 = (2./3.)*_mu_qp * (2.*(inv_density*grad_w_momentum(2) - (w_momentum/sqr_density)*grad_density(2)) - 
@@ -1174,7 +1174,7 @@ namespace GRINS
           a3_energyrow(4) = _gamma_qp*w_momentum/density;
           
             /* --- calculate b1 matrix --- */
-          b1_urow(0) = (1./sqr_density) * (mu_R*grad_u_momentum(0) + lambda*(grad_v_momentum(1)+grad_w_momentum(2)) - (mu_r/density)*(2.*u_momentum*grad_density(0) - v_momentum*grad_density(1) - w_momentum*grad_density(2)));
+          b1_urow(0) = (1./sqr_density) * (mu_R*grad_u_momentum(0) + lambda*(grad_v_momentum(1)+grad_w_momentum(2)) - (mu_R/density)*(2.*u_momentum*grad_density(0) - v_momentum*grad_density(1) - w_momentum*grad_density(2)));
           b1_urow(1) = (mu_R/sqr_density) * grad_density(0);
           b1_urow(2) = (lambda/sqr_density) * grad_density(1);
           b1_urow(3) = (lambda/sqr_density) * grad_density(2);
