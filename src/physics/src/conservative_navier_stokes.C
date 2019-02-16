@@ -396,7 +396,7 @@ namespace GRINS
           libMesh::Real _R_qp = _R;
           
             /* --- Declare flow aligned length scale variable --- */
-          libMesh::Real hvel_qp, stabSUPG_rho, stabSUPG_momentum, stabSUPG_energy;
+          libMesh::Real hvel_qp, stab_SUPG_rho, stab_SUPG_momentum, stab_SUPG_energy;
           
             /* --- Time Step Assumed to be 1.  --- */
           libMesh::Number dtime = 1.;
@@ -404,7 +404,7 @@ namespace GRINS
           // ----------------------------------------------------------------------------------------
           // Calculate jacobian ai
           // ----------------------------------------------------------------------------------------
-          libMesh::Real inv_density = 1./density);
+          libMesh::Real inv_density = 1./density;
           libMesh::Real sqr_density = (density * density);
           libMesh::Real sqr_u_momentum = u_momentum * u_momentum;
           libMesh::Real sqr_v_momentum = v_momentum * v_momentum;
@@ -414,14 +414,14 @@ namespace GRINS
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real a_qp = pow(_gamma_qp * _R_qp * T_qp, 1./2.);
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length;
           libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
-          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           unit_velocity(0) = u_momentum / velocity_vec_length;
           unit_velocity(1) = v_momentum / velocity_vec_length;
           unit_velocity(2) = w_momentum / velocity_vec_length;            
@@ -515,13 +515,13 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(rho_gradphi[ii][qp])));
               
               // Calculate density SUPG Stabilization Factor
-              stabSUPG_rho = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
+              stab_SUPG_rho = pow((pow(2./dtime, 2.) + pow(((2.*(velocity_vec_length + a_qp)) / hvel_qp), 2.)), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
             
               Frho(ii) -= JxW_density[qp] * 
                           // Conservative Navier-Stokes
                           (rho_phi[ii][qp] * rho_dot
                           //SUPG Stabilization
-                          + stabSUPG_rho *
+                          + stab_SUPG_rho *
                           (rho_gradphi[ii][qp](0) * rho_u_dot +
                            rho_gradphi[ii][qp](1) * rho_v_dot +
                            rho_gradphi[ii][qp](2) * rho_w_dot)
@@ -546,7 +546,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
               
               // Calculate SUPG Momentum Stabilization Factor
-              stabSUPG_momentum = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_mu_qp)/(density*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              stab_SUPG_momentum = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               Frho_u(ii) -= JxW_momentum[qp] * 
                             // Conservative Navier-Stokes
@@ -621,7 +621,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(conserv_energy_gradphi[ii][qp])));
               
               // Calculate SUPG Momentum Stabilization Factor
-              stabSUPG_energy = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_k_qp)/(density*_cp_qp*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               Fconserv_energy(ii) -= JxW_energy[qp] * 
                         // Conservative Navier-Stokes
@@ -757,9 +757,9 @@ namespace GRINS
           unit_velocity(2) = w_momentum / velocity_vec_length;
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);          
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real a_qp = pow(_gamma_qp*_R_qp*T_qp, 1./2.);          
           
             /* --- Gradients  --- */
           libMesh::Gradient grad_u_momentum, grad_v_momentum, grad_w_momentum;
@@ -775,7 +775,7 @@ namespace GRINS
             const libMesh::Number  grad_z_momentum_z = grad_w_momentum(2);  // If 3D Domain
           
           // Flow Aligned Length Scale
-          libMesh::Number hvel_qp, stabSUPG_rho;
+          libMesh::Number hvel_qp, stab_SUPG_rho;
           
           // Time Step Assumed to be 1.
           libMesh::Number dtime = 1.;
@@ -790,13 +790,13 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
               
               // Calculate density SUPG Stabilization Factor
-              stabSUPG_rho = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              stab_SUPG_rho = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
             
               Frho(ii) -= JxW_density[qp] * 
                           // Conservative Navier-Stokes
                           (rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z) +
                           // SUPG Stabilization
-                          stabSUPG * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z)
+                          stab_SUPG_rho * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z)
                           );
               
               if(std::isnan(Frho(ii)))
@@ -1046,7 +1046,7 @@ namespace GRINS
           libMesh::Real _R_qp = _R;
           
             /* --- Declare flow aligned length scale variable --- */
-          libMesh::Real hvel_qp, stabSUPG_momentum, stabSUPG_energy;
+          libMesh::Real hvel_qp, stab_SUPG_momentum, stab_SUPG_energy;
           
             /* --- Time Step Assumed to be 1.  --- */
           libMesh::Number dtime = 1.;
@@ -1054,7 +1054,7 @@ namespace GRINS
           // ----------------------------------------------------------------------------------------
           // Calculate jacobians (ai, bi & cij) Note: Be Conscious of negative sign when using cij
           // ----------------------------------------------------------------------------------------
-          libMesh::Real inv_density = 1./density);
+          libMesh::Real inv_density = 1./density;
           libMesh::Real sqr_density = (density * density);
           libMesh::Real sqr_u_momentum = u_momentum * u_momentum;
           libMesh::Real sqr_v_momentum = v_momentum * v_momentum;
@@ -1064,14 +1064,14 @@ namespace GRINS
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
-          libMesh::Real a_qp = (_gamma_qp * _R_qp * T_qp)^(1./2.);
+          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real a_qp = pow(_gamma_qp*_R_qp*T_qp, 1./2.);
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length;
           libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
-          velocity_vec_length = ((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum))^(1./2.);
+          velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           unit_velocity(0) = u_momentum / velocity_vec_length;
           unit_velocity(1) = v_momentum / velocity_vec_length;
           unit_velocity(2) = w_momentum / velocity_vec_length;
@@ -1530,7 +1530,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(momentum_gradphi[ii][qp])));
               
               // Calculate SUPG Momentum Stabilization Factor
-              stabSUPG_momentum = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_mu_qp)/(density*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              stab_SUPG_momentum = (pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               // Calculate U-Momentum Navier-Stokes Solution for Stabilization
               NS_stab_u = (a1_urow.add(1., b1_urow)).dot(dUdx) + (a2_urow.add(1., b2_urow)).dot(dUdy) + (a3_urow.add(1., b3_urow)).dot(dUdz) 
@@ -1552,7 +1552,7 @@ namespace GRINS
                     momentum_gradphi[ii][qp](1) * (c21_urow.dot(dUdx) + c22_urow.dot(dUdy) + c23_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz)) 
                     // SUPG Stabilization
-                    + stabSUPG_momentum * 
+                    + stab_SUPG_momentum * 
                     ((momentum_gradphi[ii][qp](0) * a1_urow.dot(NS_stab_u)) +
                      (momentum_gradphi[ii][qp](1) * a2_urow.dot(NS_stab_u)) +
                      (momentum_gradphi[ii][qp](2) * a3_urow.dot(NS_stab_u)))
@@ -1657,7 +1657,7 @@ namespace GRINS
                     momentum_gradphi[ii][qp](1) * (c21_vrow.dot(dUdx) + c22_vrow.dot(dUdy) + c23_vrow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz)) 
                     // SUPG Stabilization
-                    + stabSUPG_momentum * 
+                    + stab_SUPG_momentum * 
                     ((momentum_gradphi[ii][qp](0) * a1_vrow.dot(NS_stab_v)) +
                      (momentum_gradphi[ii][qp](1) * a2_vrow.dot(NS_stab_v)) +
                      (momentum_gradphi[ii][qp](2) * a3_vrow.dot(NS_stab_v)))
@@ -1698,7 +1698,7 @@ namespace GRINS
                       momentum_gradphi[ii][qp](1) * (c21_wrow.dot(dUdx) + c22_wrow.dot(dUdy) + c23_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
                       // SUPG Stabilization
-                      + stabSUPG_momentum * 
+                      + stab_SUPG_momentum * 
                       ((momentum_gradphi[ii][qp](0) * a1_wrow.dot(NS_stab_w)) +
                        (momentum_gradphi[ii][qp](1) * a2_wrow.dot(NS_stab_w)) +
                        (momentum_gradphi[ii][qp](2) * a3_wrow.dot(NS_stab_w)))
@@ -1846,7 +1846,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(conserv_energy_gradphi[ii][qp])));
               
               // Calculate SUPG Momentum Stabilization Factor
-              stabSUPG_energy = ((2./dtime)^2. + ((2.*(velocity_vec_length + a_qp)) / hvel_qp)^2. + ((4.*_k_qp)/(density*_cp_qp*(hvel_qp^2.)))^2.)^(-1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               // Calculate Conservative Energy Navier-Stokes Solution for Stabilization
               NS_stab_energy = (a1_energyrow.add(1., b1_energyrow)).dot(dUdx) + (a2_energyrow.add(1., b2_energyrow)).dot(dUdy) + (a3_energyrow.add(1., b3_energyrow)).dot(dUdz) 
@@ -1868,7 +1868,7 @@ namespace GRINS
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow.dot(dUdx) + c22_energyrow.dot(dUdy) + c23_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
                     // SUPG Stabilization
-                    + stabSUPG_energy * 
+                    + stab_SUPG_energy * 
                     ((conserv_energy_gradphi[ii][qp](0) * a1_energyrow.dot(NS_stab_energy)) +
                      (conserv_energy_gradphi[ii][qp](1) * a2_energyrow.dot(NS_stab_energy)) +
                      (conserv_energy_gradphi[ii][qp](2) * a3_energyrow.dot(NS_stab_energy)))
