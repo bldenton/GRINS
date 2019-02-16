@@ -997,6 +997,9 @@ namespace GRINS
       // Define Vectors and Matrices to be used for intermediate calculations of the Residual and Jacobians
       // ---------------------------------------------------------------------------------------------------------
       libMesh::DenseVector<libMesh::Number> dUdx(5, 0.), dUdy(5, 0.), dUdz(5, 0.), dWdx(5, 0.), dWdy(5, 0.), dWdz(5, 0.);
+      libMesh::DenseVector<libMesh::Number> dphidx_dUdx(5, 0.), dphidy_dUdx(5, 0.), dphidz_dUdx(5, 0.),
+                                            dphidx_dUdy(5, 0.), dphidy_dUdy(5, 0.), dphidz_dUdy(5, 0.),
+                                            dphidx_dUdz(5, 0.), dphidy_dUdz(5, 0.), dphidz_dUdz(5, 0.);
       libMesh::DenseVector<libMesh::Number> a1_urow(5, 0.), a1_vrow(5, 0.), a1_wrow(5, 0.), a1_energyrow(5, 0.),
                                             a2_urow(5, 0.), a2_vrow(5, 0.), a2_wrow(5, 0.), a2_energyrow(5, 0.),
                                             a3_urow(5, 0.), a3_vrow(5, 0.), a3_wrow(5, 0.), a3_energyrow(5, 0.),
@@ -1546,7 +1549,23 @@ namespace GRINS
           dUdz(1) = grad_u_momentum(2);
           dUdz(2) = grad_v_momentum(2);
           dUdz(3) = grad_w_momentum(2);
-          dUdz(4) = grad_conserv_energy(2);    
+          dUdz(4) = grad_conserv_energy(2); 
+          
+          for (unsigned int jj=0; jj != 3; jj++)
+            {
+              a1_plus_b1_urow(jj) = a1_urow(jj) + b1_urow(jj);      // I did it this way because the DenseVector.add()
+              a2_plus_b2_urow(jj) = a2_urow(jj) + b2_urow(jj);      // method overwrites the original vector which I
+              a3_plus_b3_urow(jj) = a3_urow(jj) + b3_urow(jj);      // still need. This way doesn't
+              a1_plus_b1_vrow(jj) = a1_vrow(jj) + b1_vrow(jj);
+              a2_plus_b2_vrow(jj) = a2_vrow(jj) + b2_vrow(jj);
+              a3_plus_b3_vrow(jj) = a3_vrow(jj) + b3_vrow(jj);
+              a1_plus_b1_wrow(jj) = a1_wrow(jj) + b1_wrow(jj);
+              a2_plus_b2_wrow(jj) = a2_wrow(jj) + b2_wrow(jj);
+              a3_plus_b3_wrow(jj) = a3_wrow(jj) + b3_wrow(jj);
+              a1_plus_b1_energyrow(jj) = a1_energyrow(jj) + b1_energyrow(jj);
+              a2_plus_b2_energyrow(jj) = a2_energyrow(jj) + b2_energyrow(jj);
+              a3_plus_b3_energyrow(jj) = a3_energyrow(jj) + b3_energyrow(jj);                   
+            }   
           
           // ------------------------------------------------------------------
           // First, an ii loop over the velocity degrees of freedom. 
@@ -1564,23 +1583,29 @@ namespace GRINS
               stab_SUPG_momentum = (pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               // Calculate U-Momentum Navier-Stokes Solution for Stabilization
-              for (unsigned int jj=0; jj != 3; jj++)
+              for (unsigned int jj=0; jj != 5; jj++)
                 {
-                  a1_plus_b1_urow(jj) = a1_urow(jj) + b1_urow(jj);      // I did it this way because the DenseVector.add()
-                  a2_plus_b2_urow(jj) = a2_urow(jj) + b2_urow(jj);      // method overwrites the original vector which I
-                  a3_plus_b3_urow(jj) = a3_urow(jj) + b3_urow(jj);      // still need. This way doesn't
+                  dphidx_dUdx(jj) = momentum_gradphi[ii][qp](0) * dUdx(jj);
+                  dphidx_dUdy(jj) = momentum_gradphi[ii][qp](0) * dUdy(jj);
+                  dphidx_dUdz(jj) = momentum_gradphi[ii][qp](0) * dUdz(jj);
+                  dphidy_dUdx(jj) = momentum_gradphi[ii][qp](1) * dUdx(jj);
+                  dphidy_dUdy(jj) = momentum_gradphi[ii][qp](1) * dUdy(jj);
+                  dphidy_dUdz(jj) = momentum_gradphi[ii][qp](1) * dUdz(jj);
+                  dphidz_dUdx(jj) = momentum_gradphi[ii][qp](2) * dUdx(jj);
+                  dphidz_dUdy(jj) = momentum_gradphi[ii][qp](2) * dUdy(jj);
+                  dphidz_dUdz(jj) = momentum_gradphi[ii][qp](2) * dUdz(jj);
                 }
                 
               NS_stab_u = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
-                          - c11_urow.dot(momementum_gradphi[ii][qp](0)*dUdx)
-                          - c12_urow.dot(momementum_gradphi[ii][qp](0)*dUdy)
-                          - c13_urow.dot(momementum_gradphi[ii][qp](0)*dUdz)
-                          - c21_urow.dot(momementum_gradphi[ii][qp](1)*dUdx)
-                          - c22_urow.dot(momementum_gradphi[ii][qp](1)*dUdy)
-                          - c23_urow.dot(momementum_gradphi[ii][qp](1)*dUdz)
-                          - c31_urow.dot(momementum_gradphi[ii][qp](2)*dUdx)
-                          - c32_urow.dot(momementum_gradphi[ii][qp](2)*dUdy)
-                          - c33_urow.dot(momementum_gradphi[ii][qp](2)*dUdz);
+                          - c11_urow.dot(dphidx_dUdx)
+                          - c12_urow.dot(dphidx_dUdy)
+                          - c13_urow.dot(dphidx_dUdz)
+                          - c21_urow.dot(dphidy_dUdx)
+                          - c22_urow.dot(dphidy_dUdy)
+                          - c23_urow.dot(dphidy_dUdz)
+                          - c31_urow.dot(dphidz_dUdx)
+                          - c32_urow.dot(dphidz_dUdy)
+                          - c33_urow.dot(dphidz_dUdz);
               
               // F{rho_u}
               Frho_u(ii) -= JxW_momentum[qp] * 
@@ -1676,23 +1701,16 @@ namespace GRINS
                 }
 
               // Calculate V-Momentum Navier-Stokes Solution for Stabilization
-              for (unsigned int jj=0; jj != 3; jj++)
-                {
-                  a1_plus_b1_vrow(jj) = a1_vrow(jj) + b1_vrow(jj);      // I did it this way because the DenseVector.add()
-                  a2_plus_b2_vrow(jj) = a2_vrow(jj) + b2_vrow(jj);      // method overwrites the original vector which I
-                  a3_plus_b3_vrow(jj) = a3_vrow(jj) + b3_vrow(jj);      // still need. This way doesn't
-                }
-                
               NS_stab_v = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
-                          - c11_vrow.dot(momementum_gradphi[ii][qp](0)*dUdx)
-                          - c12_vrow.dot(momementum_gradphi[ii][qp](0)*dUdy)
-                          - c13_vrow.dot(momementum_gradphi[ii][qp](0)*dUdz)
-                          - c21_vrow.dot(momementum_gradphi[ii][qp](1)*dUdx)
-                          - c22_vrow.dot(momementum_gradphi[ii][qp](1)*dUdy)
-                          - c23_vrow.dot(momementum_gradphi[ii][qp](1)*dUdz)
-                          - c31_vrow.dot(momementum_gradphi[ii][qp](2)*dUdx)
-                          - c32_vrow.dot(momementum_gradphi[ii][qp](2)*dUdy)
-                          - c33_vrow.dot(momementum_gradphi[ii][qp](2)*dUdz);
+                          - c11_vrow.dot(dphidx_dUdx)
+                          - c12_vrow.dot(dphidx_dUdy)
+                          - c13_vrow.dot(dphidx_dUdz)
+                          - c21_vrow.dot(dphidy_dUdx)
+                          - c22_vrow.dot(dphidy_dUdy)
+                          - c23_vrow.dot(dphidy_dUdz)
+                          - c31_vrow.dot(dphidz_dUdx)
+                          - c32_vrow.dot(dphidz_dUdy)
+                          - c33_vrow.dot(dphidz_dUdz);
               
               // F{rho_v}     
               Frho_v(ii) -= JxW_momentum[qp] * 
@@ -1723,23 +1741,16 @@ namespace GRINS
               if (this->_momentum_vars.dim() == 3)
                 {
                   // Calculate W-Momentum Navier-Stokes Solution for Stabilization
-                  for (unsigned int jj=0; jj != 3; jj++)
-                    {
-                      a1_plus_b1_wrow(jj) = a1_wrow(jj) + b1_wrow(jj);      // I did it this way because the DenseVector.add()
-                      a2_plus_b2_wrow(jj) = a2_wrow(jj) + b2_wrow(jj);      // method overwrites the original vector which I
-                      a3_plus_b3_wrow(jj) = a3_wrow(jj) + b3_wrow(jj);      // still need. This way doesn't
-                    }
-                    
                   NS_stab_w = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
-                          - c11_wrow.dot(momementum_gradphi[ii][qp](0)*dUdx)
-                          - c12_wrow.dot(momementum_gradphi[ii][qp](0)*dUdy)
-                          - c13_wrow.dot(momementum_gradphi[ii][qp](0)*dUdz)
-                          - c21_wrow.dot(momementum_gradphi[ii][qp](1)*dUdx)
-                          - c22_wrow.dot(momementum_gradphi[ii][qp](1)*dUdy)
-                          - c23_wrow.dot(momementum_gradphi[ii][qp](1)*dUdz)
-                          - c31_wrow.dot(momementum_gradphi[ii][qp](2)*dUdx)
-                          - c32_wrow.dot(momementum_gradphi[ii][qp](2)*dUdy)
-                          - c33_wrow.dot(momementum_gradphi[ii][qp](2)*dUdz);
+                          - c11_wrow.dot(dphidx_dUdx)
+                          - c12_wrow.dot(dphidx_dUdy)
+                          - c13_wrow.dot(dphidx_dUdz)
+                          - c21_wrow.dot(dphidy_dUdx)
+                          - c22_wrow.dot(dphidy_dUdy)
+                          - c23_wrow.dot(dphidy_dUdz)
+                          - c31_wrow.dot(dphidz_dUdx)
+                          - c32_wrow.dot(dphidz_dUdy)
+                          - c33_wrow.dot(dphidz_dUdz);
                 
                 
                   // F{rho_w}
@@ -1905,23 +1916,29 @@ namespace GRINS
               stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
               
               // Calculate Conservative Energy Navier-Stokes Solution for Stabilization
-              for (unsigned int jj=0; jj != 3; jj++)
+              for (unsigned int jj=0; jj != 5; jj++)
                 {
-                  a1_plus_b1_energyrow(jj) = a1_energyrow(jj) + b1_energyrow(jj);      // I did it this way because the DenseVector.add()
-                  a2_plus_b2_energyrow(jj) = a2_energyrow(jj) + b2_energyrow(jj);      // method overwrites the original vector which I
-                  a3_plus_b3_energyrow(jj) = a3_energyrow(jj) + b3_energyrow(jj);      // still need. This way doesn't
+                  dphidx_dUdx(jj) = conserv_energy_gradphi[ii][qp](0) * dUdx(jj);
+                  dphidx_dUdy(jj) = conserv_energy_gradphi[ii][qp](0) * dUdy(jj);
+                  dphidx_dUdz(jj) = conserv_energy_gradphi[ii][qp](0) * dUdz(jj);
+                  dphidy_dUdx(jj) = conserv_energy_gradphi[ii][qp](1) * dUdx(jj);
+                  dphidy_dUdy(jj) = conserv_energy_gradphi[ii][qp](1) * dUdy(jj);
+                  dphidy_dUdz(jj) = conserv_energy_gradphi[ii][qp](1) * dUdz(jj);
+                  dphidz_dUdx(jj) = conserv_energy_gradphi[ii][qp](2) * dUdx(jj);
+                  dphidz_dUdy(jj) = conserv_energy_gradphi[ii][qp](2) * dUdy(jj);
+                  dphidz_dUdz(jj) = conserv_energy_gradphi[ii][qp](2) * dUdz(jj);
                 }
                 
               NS_stab_energy = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
-                              - c11_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdx)
-                              - c12_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdy)
-                              - c13_energyrow.dot(conserv_energy_gradphi[ii][qp](0)*dUdz)
-                              - c21_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdx)
-                              - c22_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdy)
-                              - c23_energyrow.dot(conserv_energy_gradphi[ii][qp](1)*dUdz)
-                              - c31_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdx)
-                              - c32_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdy)
-                              - c33_energyrow.dot(conserv_energy_gradphi[ii][qp](2)*dUdz);
+                              - c11_energyrow.dot(dphidx_dUdx)
+                              - c12_energyrow.dot(dphidx_dUdy)
+                              - c13_energyrow.dot(dphidx_dUdz)
+                              - c21_energyrow.dot(dphidy_dUdx)
+                              - c22_energyrow.dot(dphidy_dUdy)
+                              - c23_energyrow.dot(dphidy_dUdz)
+                              - c31_energyrow.dot(dphidz_dUdx)
+                              - c32_energyrow.dot(dphidz_dUdy)
+                              - c33_energyrow.dot(dphidz_dUdz);
             
               // F{conserv_energy}
               Fconserv_energy(ii) -= JxW_energy[qp] *
