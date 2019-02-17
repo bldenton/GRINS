@@ -233,7 +233,7 @@ namespace GRINS
       
       // Open Debug File
       std::ofstream mass_r;
-      mass_r.open("mass_residual_NaN.txt");
+      mass_r.open("/kif1/data/users/bldenton/GRINS/installgrins_bd/examples/conservative_ns/mass_residual_NaN.txt");
       
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
