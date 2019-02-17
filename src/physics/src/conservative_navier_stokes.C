@@ -1018,11 +1018,11 @@ namespace GRINS
       libMesh::DenseVector<libMesh::Number> d_dx_rho(5, 0.), d_dx_umomentum(5, 0.), d_dx_vmomentum(5, 0.), d_dx_wmomentum(5, 0.), d_dx_conserv_energy(5, 0.),
                                             d_dy_rho(5, 0.), d_dy_umomentum(5, 0.), d_dy_vmomentum(5, 0.), d_dy_wmomentum(5, 0.), d_dy_conserv_energy(5, 0.),
                                             d_dz_rho(5, 0.), d_dz_umomentum(5, 0.), d_dz_vmomentum(5, 0.), d_dz_wmomentum(5, 0.), d_dz_conserv_energy(5, 0.);
-      libMesh::DenseVector<libMesh::Number> NS_stab_u(5, 0.), NS_stab_v(5, 0.), NS_stab_w(5, 0.), NS_stab_energy(5, 0.);
       libMesh::DenseVector<libMesh::Number> momentum_dphi(3, 0.), energy_dphi(3, 0.);
       libMesh::DenseVector<libMesh::Number> a1_plus_b1_urow(5, 0.), a1_plus_b1_vrow(5, 0.), a1_plus_b1_wrow(5, 0.), a1_plus_b1_energyrow(5, 0.),
                                             a2_plus_b2_urow(5, 0.), a2_plus_b2_vrow(5, 0.), a2_plus_b2_wrow(5, 0.), a2_plus_b2_energyrow(5, 0.),
                                             a3_plus_b3_urow(5, 0.), a3_plus_b3_vrow(5, 0.), a3_plus_b3_wrow(5, 0.), a3_plus_b3_energyrow(5, 0.);
+      libMesh::DenseVector<libMesh::Number> NS_stab_momentum(5, 0.), NS_stab_energy(5, 0.);
       
       
       // -------------------------------------------------------------------------------------------------------------------------------------------------           
@@ -1551,7 +1551,7 @@ namespace GRINS
           dUdz(3) = grad_w_momentum(2);
           dUdz(4) = grad_conserv_energy(2); 
           
-          for (unsigned int jj=0; jj != 3; jj++)
+          for (unsigned int jj=0; jj != 5; jj++)
             {
               a1_plus_b1_urow(jj) = a1_urow(jj) + b1_urow(jj);      // I did it this way because the DenseVector.add()
               a2_plus_b2_urow(jj) = a2_urow(jj) + b2_urow(jj);      // method overwrites the original vector which I
@@ -1595,17 +1595,52 @@ namespace GRINS
                   dphidz_dUdy(jj) = momentum_gradphi[ii][qp](2) * dUdy(jj);
                   dphidz_dUdz(jj) = momentum_gradphi[ii][qp](2) * dUdz(jj);
                 }
+              
+              NS_stab_momentum(0) = dUdx(1) + dUdy(2) + dUdx(3);
                 
-              NS_stab_u = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
-                          - c11_urow.dot(dphidx_dUdx)
-                          - c12_urow.dot(dphidx_dUdy)
-                          - c13_urow.dot(dphidx_dUdz)
-                          - c21_urow.dot(dphidy_dUdx)
-                          - c22_urow.dot(dphidy_dUdy)
-                          - c23_urow.dot(dphidy_dUdz)
-                          - c31_urow.dot(dphidz_dUdx)
-                          - c32_urow.dot(dphidz_dUdy)
-                          - c33_urow.dot(dphidz_dUdz);
+              NS_stab_momentum(1) = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
+                  - c11_urow.dot(dphidx_dUdx)
+                  - c12_urow.dot(dphidx_dUdy)
+                  - c13_urow.dot(dphidx_dUdz)
+                  - c21_urow.dot(dphidy_dUdx)
+                  - c22_urow.dot(dphidy_dUdy)
+                  - c23_urow.dot(dphidy_dUdz)
+                  - c31_urow.dot(dphidz_dUdx)
+                  - c32_urow.dot(dphidz_dUdy)
+                  - c33_urow.dot(dphidz_dUdz);
+                            
+              NS_stab_momentum(2) = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
+                  - c11_vrow.dot(dphidx_dUdx)
+                  - c12_vrow.dot(dphidx_dUdy)
+                  - c13_vrow.dot(dphidx_dUdz)
+                  - c21_vrow.dot(dphidy_dUdx)
+                  - c22_vrow.dot(dphidy_dUdy)
+                  - c23_vrow.dot(dphidy_dUdz)
+                  - c31_vrow.dot(dphidz_dUdx)
+                  - c32_vrow.dot(dphidz_dUdy)
+                  - c33_vrow.dot(dphidz_dUdz);
+
+              NS_stab_momentum(3) = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
+                  - c11_wrow.dot(dphidx_dUdx)
+                  - c12_wrow.dot(dphidx_dUdy)
+                  - c13_wrow.dot(dphidx_dUdz)
+                  - c21_wrow.dot(dphidy_dUdx)
+                  - c22_wrow.dot(dphidy_dUdy)
+                  - c23_wrow.dot(dphidy_dUdz)
+                  - c31_wrow.dot(dphidz_dUdx)
+                  - c32_wrow.dot(dphidz_dUdy)
+                  - c33_wrow.dot(dphidz_dUdz);
+              
+              NS_stab_momentum(4) = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
+                  - c11_energyrow.dot(dphidx_dUdx)
+                  - c12_energyrow.dot(dphidx_dUdy)
+                  - c13_energyrow.dot(dphidx_dUdz)
+                  - c21_energyrow.dot(dphidy_dUdx)
+                  - c22_energyrow.dot(dphidy_dUdy)
+                  - c23_energyrow.dot(dphidy_dUdz)
+                  - c31_energyrow.dot(dphidz_dUdx)
+                  - c32_energyrow.dot(dphidz_dUdy)
+                  - c33_energyrow.dot(dphidz_dUdz);
               
               // F{rho_u}
               Frho_u(ii) -= JxW_momentum[qp] * 
@@ -1616,9 +1651,9 @@ namespace GRINS
                     momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz)) 
                     // SUPG Stabilization
                     + stab_SUPG_momentum * 
-                    ((momentum_gradphi[ii][qp](0) * a1_urow.dot(NS_stab_u)) +
-                     (momentum_gradphi[ii][qp](1) * a2_urow.dot(NS_stab_u)) +
-                     (momentum_gradphi[ii][qp](2) * a3_urow.dot(NS_stab_u)))
+                    ((momentum_gradphi[ii][qp](0) * a1_urow.dot(NS_stab_momentum)) +
+                     (momentum_gradphi[ii][qp](1) * a2_urow.dot(NS_stab_momentum)) +
+                     (momentum_gradphi[ii][qp](2) * a3_urow.dot(NS_stab_momentum)))
                     // Shock Capturing Operator -- IN Process
                     );
                     
@@ -1699,18 +1734,6 @@ namespace GRINS
                   
                   std::cout << " -----------------------" << "\n";
                 }
-
-              // Calculate V-Momentum Navier-Stokes Solution for Stabilization
-              NS_stab_v = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
-                          - c11_vrow.dot(dphidx_dUdx)
-                          - c12_vrow.dot(dphidx_dUdy)
-                          - c13_vrow.dot(dphidx_dUdz)
-                          - c21_vrow.dot(dphidy_dUdx)
-                          - c22_vrow.dot(dphidy_dUdy)
-                          - c23_vrow.dot(dphidy_dUdz)
-                          - c31_vrow.dot(dphidz_dUdx)
-                          - c32_vrow.dot(dphidz_dUdy)
-                          - c33_vrow.dot(dphidz_dUdz);
               
               // F{rho_v}     
               Frho_v(ii) -= JxW_momentum[qp] * 
@@ -1721,9 +1744,9 @@ namespace GRINS
                     momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz)) 
                     // SUPG Stabilization
                     + stab_SUPG_momentum * 
-                    ((momentum_gradphi[ii][qp](0) * a1_vrow.dot(NS_stab_v)) +
-                     (momentum_gradphi[ii][qp](1) * a2_vrow.dot(NS_stab_v)) +
-                     (momentum_gradphi[ii][qp](2) * a3_vrow.dot(NS_stab_v)))
+                    ((momentum_gradphi[ii][qp](0) * a1_vrow.dot(NS_stab_momentum)) +
+                     (momentum_gradphi[ii][qp](1) * a2_vrow.dot(NS_stab_momentum)) +
+                     (momentum_gradphi[ii][qp](2) * a3_vrow.dot(NS_stab_momentum)))
                     // Shock Capturing Operator -- IN Process
                     );
                     
@@ -1740,19 +1763,6 @@ namespace GRINS
                     
               if (this->_momentum_vars.dim() == 3)
                 {
-                  // Calculate W-Momentum Navier-Stokes Solution for Stabilization
-                  NS_stab_w = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
-                          - c11_wrow.dot(dphidx_dUdx)
-                          - c12_wrow.dot(dphidx_dUdy)
-                          - c13_wrow.dot(dphidx_dUdz)
-                          - c21_wrow.dot(dphidy_dUdx)
-                          - c22_wrow.dot(dphidy_dUdy)
-                          - c23_wrow.dot(dphidy_dUdz)
-                          - c31_wrow.dot(dphidz_dUdx)
-                          - c32_wrow.dot(dphidz_dUdy)
-                          - c33_wrow.dot(dphidz_dUdz);
-                
-                
                   // F{rho_w}
                   (*Frho_w)(ii) -= JxW_momentum[qp] *
                       // Conservative Navier-Stokes
@@ -1762,9 +1772,9 @@ namespace GRINS
                       momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
                       // SUPG Stabilization
                       + stab_SUPG_momentum * 
-                      ((momentum_gradphi[ii][qp](0) * a1_wrow.dot(NS_stab_w)) +
-                       (momentum_gradphi[ii][qp](1) * a2_wrow.dot(NS_stab_w)) +
-                       (momentum_gradphi[ii][qp](2) * a3_wrow.dot(NS_stab_w)))
+                      ((momentum_gradphi[ii][qp](0) * a1_wrow.dot(NS_stab_momentum)) +
+                       (momentum_gradphi[ii][qp](1) * a2_wrow.dot(NS_stab_momentum)) +
+                       (momentum_gradphi[ii][qp](2) * a3_wrow.dot(NS_stab_momentum)))
                       // Shock Capturing Operator -- IN Process                      
                       );
                       
@@ -1929,16 +1939,51 @@ namespace GRINS
                   dphidz_dUdz(jj) = conserv_energy_gradphi[ii][qp](2) * dUdz(jj);
                 }
                 
-              NS_stab_energy = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
-                              - c11_energyrow.dot(dphidx_dUdx)
-                              - c12_energyrow.dot(dphidx_dUdy)
-                              - c13_energyrow.dot(dphidx_dUdz)
-                              - c21_energyrow.dot(dphidy_dUdx)
-                              - c22_energyrow.dot(dphidy_dUdy)
-                              - c23_energyrow.dot(dphidy_dUdz)
-                              - c31_energyrow.dot(dphidz_dUdx)
-                              - c32_energyrow.dot(dphidz_dUdy)
-                              - c33_energyrow.dot(dphidz_dUdz);
+              NS_stab_energy(0) = dUdx(1) + dUdy(2) + dUdx(3);
+                
+              NS_stab_energy(1) = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
+                  - c11_urow.dot(dphidx_dUdx)
+                  - c12_urow.dot(dphidx_dUdy)
+                  - c13_urow.dot(dphidx_dUdz)
+                  - c21_urow.dot(dphidy_dUdx)
+                  - c22_urow.dot(dphidy_dUdy)
+                  - c23_urow.dot(dphidy_dUdz)
+                  - c31_urow.dot(dphidz_dUdx)
+                  - c32_urow.dot(dphidz_dUdy)
+                  - c33_urow.dot(dphidz_dUdz);
+                            
+              NS_stab_energy(2) = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
+                  - c11_vrow.dot(dphidx_dUdx)
+                  - c12_vrow.dot(dphidx_dUdy)
+                  - c13_vrow.dot(dphidx_dUdz)
+                  - c21_vrow.dot(dphidy_dUdx)
+                  - c22_vrow.dot(dphidy_dUdy)
+                  - c23_vrow.dot(dphidy_dUdz)
+                  - c31_vrow.dot(dphidz_dUdx)
+                  - c32_vrow.dot(dphidz_dUdy)
+                  - c33_vrow.dot(dphidz_dUdz);
+
+              NS_stab_energy(3) = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
+                  - c11_wrow.dot(dphidx_dUdx)
+                  - c12_wrow.dot(dphidx_dUdy)
+                  - c13_wrow.dot(dphidx_dUdz)
+                  - c21_wrow.dot(dphidy_dUdx)
+                  - c22_wrow.dot(dphidy_dUdy)
+                  - c23_wrow.dot(dphidy_dUdz)
+                  - c31_wrow.dot(dphidz_dUdx)
+                  - c32_wrow.dot(dphidz_dUdy)
+                  - c33_wrow.dot(dphidz_dUdz);
+              
+              NS_stab_energy(4) = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
+                  - c11_energyrow.dot(dphidx_dUdx)
+                  - c12_energyrow.dot(dphidx_dUdy)
+                  - c13_energyrow.dot(dphidx_dUdz)
+                  - c21_energyrow.dot(dphidy_dUdx)
+                  - c22_energyrow.dot(dphidy_dUdy)
+                  - c23_energyrow.dot(dphidy_dUdz)
+                  - c31_energyrow.dot(dphidz_dUdx)
+                  - c32_energyrow.dot(dphidz_dUdy)
+                  - c33_energyrow.dot(dphidz_dUdz);
             
               // F{conserv_energy}
               Fconserv_energy(ii) -= JxW_energy[qp] *
