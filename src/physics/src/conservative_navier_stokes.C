@@ -813,7 +813,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
               
               // Calculate density SUPG Stabilization Factor
-              test = pow(2./dtime, 2.);
+              test = pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.);
               stab_SUPG_rho = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
             
               Frho(ii) -= JxW_density[qp] * 
