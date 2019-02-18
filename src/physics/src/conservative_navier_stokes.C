@@ -833,7 +833,9 @@ namespace GRINS
                             << "grad_v_momentum_y = " << grad_v_momentum_y << "\n"
                             << "grad_w_momentum_z = " << grad_w_momentum_z << "\n"
                             << "stab_SUPG_rho = " << stab_SUPG_rho << "\n"
-                            << "test = " << test << "/n"
+                            << "test = " << test << "\n"
+                            << "hvel_qp = " << hvel_qp << "\n"
+                            << "density = " << density << "\n"
                             << " -----------------------" << "\n";
                 }
               
