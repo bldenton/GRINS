@@ -842,6 +842,8 @@ namespace GRINS
                             << "_gamma_qp = " << _gamma_qp << "\n"
                             << "_R_qp = " << _R_qp << "\n"
                             << "conserv_energy = " << conserv_energy << "\n"
+                            << "rho_gradphi[ii][qp](0) = " << rho_gradphi[ii][qp](0) << "\n"
+                            << "rho_phi[ii][qp] ] " << rho_phi[ii][qp] << "\n"
                             << " -----------------------" << "\n";
                 }
               
