@@ -836,6 +836,7 @@ namespace GRINS
                             << "test = " << test << "\n"
                             << "hvel_qp = " << hvel_qp << "\n"
                             << "density = " << density << "\n"
+                            << "velocity_vec_length = " << velocity_vec_length << "\n"
                             << " -----------------------" << "\n";
                 }
               
