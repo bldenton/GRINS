@@ -797,6 +797,7 @@ namespace GRINS
           
           // Time Step Assumed to be 1.
           libMesh::Number dtime = 1.;
+          libMesh::Number test;
           
           // ------------------------------------------------------------
           // Loop over the density degrees of freedom
@@ -812,6 +813,7 @@ namespace GRINS
               hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
               
               // Calculate density SUPG Stabilization Factor
+              test = pow(2./dtime, 2.);
               stab_SUPG_rho = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
             
               Frho(ii) -= JxW_density[qp] * 
@@ -830,7 +832,8 @@ namespace GRINS
                             << "grad_u_momentum_x = " << grad_u_momentum_x << "\n"
                             << "grad_v_momentum_y = " << grad_v_momentum_y << "\n"
                             << "grad_w_momentum_z = " << grad_w_momentum_z << "\n"
-                            << "stabSUPG = " << stab_SUPG_rho << "\n"
+                            << "stab_SUPG_rho = " << stab_SUPG_rho << "\n"
+                            << "test = " << test << "/n"
                             << " -----------------------" << "\n";
                 }
               
