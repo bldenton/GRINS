@@ -837,6 +837,10 @@ namespace GRINS
                             << "hvel_qp = " << hvel_qp << "\n"
                             << "density = " << density << "\n"
                             << "velocity_vec_length = " << velocity_vec_length << "\n"
+                            << "a_qp = " << a_qp << "\n"
+                            << "T_qp = " << T_qp << "\n"
+                            << "_gamma_qp = " << _gamma_qp << "\n"
+                            << "_R_qp = " << _R_qp << "\n"
                             << " -----------------------" << "\n";
                 }
               
