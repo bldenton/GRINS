@@ -421,7 +421,7 @@ namespace GRINS
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length;
-          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           unit_velocity(0) = u_momentum / velocity_vec_length;
           unit_velocity(1) = v_momentum / velocity_vec_length;
@@ -764,7 +764,7 @@ namespace GRINS
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length, sqr_density, sqr_u_momentum, sqr_v_momentum, sqr_w_momentum;
-          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           sqr_density = density * density;
           sqr_u_momentum = u_momentum * u_momentum;
           sqr_v_momentum = v_momentum * v_momentum;
@@ -1100,7 +1100,7 @@ namespace GRINS
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length;
-          libMesh::DenseVector<libMesh::Number> velocity, unit_velocity;
+          libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           unit_velocity(0) = u_momentum / velocity_vec_length;
           unit_velocity(1) = v_momentum / velocity_vec_length;
