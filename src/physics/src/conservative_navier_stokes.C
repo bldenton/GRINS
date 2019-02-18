@@ -841,6 +841,7 @@ namespace GRINS
                             << "T_qp = " << T_qp << "\n"
                             << "_gamma_qp = " << _gamma_qp << "\n"
                             << "_R_qp = " << _R_qp << "\n"
+                            << "conserv_energy = " << conserv_energy << "\n"
                             << " -----------------------" << "\n";
                 }
               
