@@ -842,6 +842,12 @@ namespace GRINS
                             << "_gamma_qp = " << _gamma_qp << "\n"
                             << "_R_qp = " << _R_qp << "\n"
                             << "conserv_energy = " << conserv_energy << "\n"
+                            << "u_momentum = " << u_momentum << "\n"
+                            << "v_momentum = " << v_momentum << "\n"
+                            << "w_momentum = " << w_momentum << "\n"
+                            << "sqr_u_momentum = " << sqr_u_momentum << "\n"
+                            << "sqr_v_momentum = " << sqr_v_momentum << "\n"
+                            << "sqr_w_momentum = " << sqr_w_momentum << "\n"
                             << "rho_gradphi[ii][qp](0) = " << rho_gradphi[ii][qp](0) << "\n"
                             << " -----------------------" << "\n";
                 }
