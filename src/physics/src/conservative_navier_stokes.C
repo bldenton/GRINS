@@ -850,6 +850,8 @@ namespace GRINS
                             << "sqr_w_momentum = " << sqr_w_momentum << "\n"
                             << "rho_gradphi[ii][qp](0) = " << rho_gradphi[ii][qp](0) << "\n"
                             << " -----------------------" << "\n";
+                            
+                  std::cin.get();
                 }
               
               /* if (compute_jacobian)
