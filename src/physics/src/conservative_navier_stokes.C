@@ -779,7 +779,9 @@ namespace GRINS
           libMesh::Real P_qp = (_gamma_qp - 1.) * density * conserv_energy; //(_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = pow(_gamma_qp*_R_qp*T_qp, 1./2.);
           
-          std::cout << " _gamma_qp = " << _gamma_qp << "\n"
+          std::cout << " qp = "  << qp << "\n"
+                    << " _cp_qp = " << _cp_qp << "\n"
+                    << " _gamma_qp = " << _gamma_qp << "\n"
                     << " conserv_energy = " << conserv_energy << "\n"
                     << " _R_qp = " << _R_qp << "\n"
                     << " density = " << density << "\n" 
