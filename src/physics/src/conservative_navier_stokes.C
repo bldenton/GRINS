@@ -673,7 +673,7 @@ namespace GRINS
       // Element Jacobian * Quadrature weights for interior integration.
       const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
       
-      const std::vector<std::vector<libMesh::Point> >& rho_xyz = 
+      const std::vector<libMesh::Point>& rho_xyz = 
         context.get_element_fe(this->_density_var.rho())->get_xyz();
       
       // Get Shape Functions at interior quadrature points for each variable
