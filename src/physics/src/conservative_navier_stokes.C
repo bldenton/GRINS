@@ -854,8 +854,8 @@ namespace GRINS
                             << "rho_gradphi[ii][qp](0) = " << rho_gradphi[ii][qp](0) << "\n"
                             << " qp = " << qp << "\n"
                             << " (x, y, z) = (" << rho_xyz[qp](0) << ", "
-                                                << rho_xyz[qp](1) >> ", "
-                                                << rho_xyz[qp](2) >> ") " << "\n"
+                                                << rho_xyz[qp](1) << ", "
+                                                << rho_xyz[qp](2) << ") " << "\n"
                             << " -----------------------" << "\n";
                             
                   std::cin.get();
