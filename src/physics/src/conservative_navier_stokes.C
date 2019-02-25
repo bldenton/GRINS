@@ -673,6 +673,9 @@ namespace GRINS
       // Element Jacobian * Quadrature weights for interior integration.
       const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
       
+      const std::vector<std::vector<libMesh::Real> >& rho_xyz = 
+        context.get_element_fe(this->_density_var.rho())->get_xyz();
+      
       // Get Shape Functions at interior quadrature points for each variable
         /* --- Density   --- */
       const std::vector<std::vector<libMesh::Real> >& rho_phi = 
@@ -778,17 +781,7 @@ namespace GRINS
           libMesh::Real T_qp = (_gamma_qp - 1.) * conserv_energy / _R_qp;   //(_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real P_qp = (_gamma_qp - 1.) * density * conserv_energy; //(_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = pow(_gamma_qp*_R_qp*T_qp, 1./2.);
-          
-          std::cout << " qp = "  << qp << "\n"
-                    << " _cp_qp = " << _cp_qp << "\n"
-                    << " _gamma_qp = " << _gamma_qp << "\n"
-                    << " conserv_energy = " << conserv_energy << "\n"
-                    << " _R_qp = " << _R_qp << "\n"
-                    << " density = " << density << "\n" 
-                    << " T_qp = " << T_qp << "\n"
-                    << " a_qp = " << a_qp << "\n";
-             
-          
+
             /* --- Gradients  --- */
           libMesh::Gradient grad_u_momentum, grad_v_momentum, grad_w_momentum;
           grad_u_momentum = context.interior_gradient(this->_momentum_vars.rho_u(), qp);    // grad(u_momentum)
@@ -859,6 +852,10 @@ namespace GRINS
                             << "sqr_v_momentum = " << sqr_v_momentum << "\n"
                             << "sqr_w_momentum = " << sqr_w_momentum << "\n"
                             << "rho_gradphi[ii][qp](0) = " << rho_gradphi[ii][qp](0) << "\n"
+                            << " qp = " << qp << "\n"
+                            << " (x, y, z) = " << rho_xyz[qp](0) << ", "
+                                               << rho_xyz[qp](1) << ", "
+                                               << rho_xyz[qp](2) << ", " << "\n"
                             << " -----------------------" << "\n";
                             
                   std::cin.get();
