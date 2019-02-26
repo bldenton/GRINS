@@ -1170,7 +1170,7 @@ namespace GRINS
           libMesh::Real a_qp = pow(_gamma_qp*_R_qp*T_qp, 1./2.);
           
             /* --- Calculate Velocity Vector  ---*/  
-          libMesh::Number velocity_vec_length;
+          libMesh::Number velocity_vec_length, test;
           libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
           
