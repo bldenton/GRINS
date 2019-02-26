@@ -231,10 +231,6 @@ namespace GRINS
       // ------ M(u)                                        -----
       // --------------------------------------------------------
       
-      // Open Debug File
-      std::ofstream mass_r;
-      mass_r.open("/kif1/data/users/bldenton/GRINS/installgrins_bd/examples/conservative_ns/mass_residual_NaN.txt");
-      
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
@@ -423,9 +419,19 @@ namespace GRINS
           libMesh::Number velocity_vec_length;
           libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
-          unit_velocity(0) = u_momentum / velocity_vec_length;
-          unit_velocity(1) = v_momentum / velocity_vec_length;
-          unit_velocity(2) = w_momentum / velocity_vec_length;            
+
+          if (velocity_vec_length != 0.)
+            {
+              unit_velocity(0) = u_momentum / velocity_vec_length;
+              unit_velocity(1) = v_momentum / velocity_vec_length;
+              unit_velocity(2) = w_momentum / velocity_vec_length;
+            }
+          else
+            {
+              unit_velocity(0) = 0.;
+              unit_velocity(1) = 0.;
+              unit_velocity(2) = 0.;
+            }            
             
             /* --- calculate a1 matrix  --- */
           a1_urow(0) = (_gamma_qp - 3.) * sqr_u_momentum / (2. * sqr_density) + ((_gamma_qp - 1.)/(2. * sqr_density))*(sqr_v_momentum + sqr_w_momentum);
@@ -517,10 +523,17 @@ namespace GRINS
               rho_dphi(1) = rho_gradphi[ii][qp](1);
               rho_dphi(2) = rho_gradphi[ii][qp](2);
               
-              hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
+              if (abs(unit_velocity.dot(rho_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
               
-              // Calculate density SUPG Stabilization Factor
-              stab_SUPG_rho = pow((pow(2./dtime, 2.) + pow(((2.*(velocity_vec_length + a_qp)) / hvel_qp), 2.)), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]           
+                  // Calculate density SUPG Stabilization Factor
+                  stab_SUPG_rho = pow((pow(2./dtime, 2.) + pow(((2.*(velocity_vec_length + a_qp)) / hvel_qp), 2.)), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State] 
+                }
+              else
+                {
+                  stab_SUPG_rho = 0.;
+                }          
             
               Frho(ii) -= JxW_density[qp] * 
                           // Conservative Navier-Stokes
@@ -533,13 +546,13 @@ namespace GRINS
                           );
               
               if(std::isnan(Frho(ii)))
-                { mass_r << "--- mass_residual() ---" << "\n";
-                  mass_r << "Frho(ii) = " << Frho(ii) << "\n";
-                  mass_r << "ii = " << ii;
-                  mass_r << "JxW_density[qp] = " << JxW_density[qp] << "\n";
-                  mass_r << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n";
-                  mass_r << "rho_dot = " << rho_dot << "\n";
-                  mass_r << " -----------------------" << "\n";
+                { std::cout << "--- mass_residual() ---" << "\n"
+                            << "Frho(ii) = " << Frho(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_density[qp] = " << JxW_density[qp] << "\n"
+                            << "rho_phi[ii][qp] = " << rho_phi[ii][qp] << "\n"
+                            << "rho_dot = " << rho_dot << "\n"
+                            << " -----------------------" << "\n";
                 }
               
               // Need to add Mrho_rho calculations here
@@ -552,10 +565,17 @@ namespace GRINS
               momentum_dphi(1) = momentum_gradphi[ii][qp](1);
               momentum_dphi(2) = momentum_gradphi[ii][qp](2);
               
-              hvel_qp = 2./(abs(unit_velocity.dot(momentum_dphi)));
+              if (abs(unit_velocity.dot(momentum_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(momentum_dphi)));
               
-              // Calculate SUPG Momentum Stabilization Factor
-              stab_SUPG_momentum = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                  // Calculate density SUPG Stabilization Factor
+                  stab_SUPG_momentum = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                }
+              else
+                {
+                  stab_SUPG_momentum = 0.;
+                }  
               
               Frho_u(ii) -= JxW_momentum[qp] * 
                             // Conservative Navier-Stokes
@@ -589,35 +609,35 @@ namespace GRINS
                             );
               
               if(std::isnan(Frho_u(ii)))
-                { mass_r << "--- mass_residual() ---" << "\n";
-                  mass_r << "Frho_u(ii) = " << Frho_u(ii) << "\n";
-                  mass_r << "ii = " << ii;
-                  mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                  mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                  mass_r << "rho_u_dot = " << rho_u_dot << "\n";
-                  mass_r << " -----------------------" << "\n";
+                { std::cout << "--- mass_residual() ---" << "\n"
+                            << "Frho_u(ii) = " << Frho_u(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n"
+                            << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n"
+                            << "rho_u_dot = " << rho_u_dot << "\n"
+                            << " -----------------------" << "\n";
                 }
               
               if(std::isnan(Frho_v(ii)))
-                { mass_r << "--- mass_residual() ---" << "\n";
-                  mass_r << "Frho_v(ii) = " << Frho_v(ii) << "\n";
-                  mass_r << "ii = " << ii;
-                  mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                  mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                  mass_r << "rho_v_dot = " << rho_v_dot << "\n";
-                  mass_r << " -----------------------" << "\n";
+                { std::cout << "--- mass_residual() ---" << "\n"
+                            << "Frho_v(ii) = " << Frho_v(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n"
+                            << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n"
+                            << "rho_v_dot = " << rho_v_dot << "\n"
+                            << " -----------------------" << "\n";
                 }
                 
               if ( this -> _momentum_vars.dim() == 3)                
                 {
                   if(std::isnan((*Frho_w)(ii)))
-                    { mass_r << "--- mass_residual() ---" << "\n";
-                      mass_r << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
-                      mass_r << "ii = " << ii;
-                      mass_r << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                      mass_r << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n";
-                      mass_r << "rho_w_dot = " << rho_w_dot << "\n";
-                      mass_r << " -----------------------" << "\n";
+                    { std::cout << "--- mass_residual() ---" << "\n"
+                                << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n"
+                                << "ii = " << ii << "\n"
+                                << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n"
+                                << "momentum_phi[ii][qp] = " << momentum_phi[ii][qp] << "\n"
+                                << "rho_w_dot = " << rho_w_dot << "\n"
+                                << " -----------------------" << "\n";
                     }
                  } 
               
@@ -630,11 +650,18 @@ namespace GRINS
               energy_dphi(0) = conserv_energy_gradphi[ii][qp](0);
               energy_dphi(1) = conserv_energy_gradphi[ii][qp](1);
               energy_dphi(2) = conserv_energy_gradphi[ii][qp](2);
+
+              if (abs(unit_velocity.dot(energy_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(energy_dphi)));
               
-              hvel_qp = 2./(abs(unit_velocity.dot(energy_dphi)));
-              
-              // Calculate SUPG Momentum Stabilization Factor
-              stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                  // Calculate density SUPG Stabilization Factor
+                  stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                }
+              else
+                {
+                  stab_SUPG_energy = 0.;
+                }               
               
               Fconserv_energy(ii) -= JxW_energy[qp] * 
                         // Conservative Navier-Stokes
@@ -647,20 +674,18 @@ namespace GRINS
                         );
               
               if(std::isnan(Fconserv_energy(ii)))
-                { mass_r << "--- mass_residual() ---" << "\n";
-                  mass_r << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
-                  mass_r << "ii = " << ii;
-                  mass_r << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
-                  mass_r << "conserv_energy_phi[ii][qp] = " << conserv_energy_phi[ii][qp] << "\n";
-                  mass_r << "energy_dot = " << energy_dot << "\n";
-                  mass_r << " -----------------------" << "\n";
+                { std::cout << "--- mass_residual() ---" << "\n"
+                            << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_energy[qp] = " << JxW_energy[qp] << "\n"
+                            << "conserv_energy_phi[ii][qp] = " << conserv_energy_phi[ii][qp] << "\n"
+                            << "energy_dot = " << energy_dot << "\n"
+                            << " -----------------------" << "\n";
                 }
               
               // Need to add Menergy_energy calculations here
             }  // end conservative energy quadrature loop
-        }  // end of qp loop
-        
-        mass_r.close();    
+        }  // end of qp loop  
     }
     
     // ----------------------------------------------------------
@@ -773,9 +798,19 @@ namespace GRINS
           sqr_v_momentum = v_momentum * v_momentum;
           sqr_w_momentum = w_momentum * w_momentum;
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
-          unit_velocity(0) = u_momentum / velocity_vec_length;
-          unit_velocity(1) = v_momentum / velocity_vec_length;
-          unit_velocity(2) = w_momentum / velocity_vec_length;
+
+          if (velocity_vec_length != 0.)
+            {
+              unit_velocity(0) = u_momentum / velocity_vec_length;
+              unit_velocity(1) = v_momentum / velocity_vec_length;
+              unit_velocity(2) = w_momentum / velocity_vec_length;
+            }
+          else
+            {
+              unit_velocity(0) = 0.;
+              unit_velocity(1) = 0.;
+              unit_velocity(2) = 0.;
+            }
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
           libMesh::Real T_qp = (_gamma_qp - 1.) * conserv_energy / _R_qp;   //(_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
@@ -813,11 +848,20 @@ namespace GRINS
               rho_dphi(1) = rho_gradphi[ii][qp](1);
               rho_dphi(2) = rho_gradphi[ii][qp](2);
               
-              hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
+              test = 0.;
+
+              if (abs(unit_velocity.dot(rho_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(rho_dphi)));
               
-              // Calculate density SUPG Stabilization Factor
-              test = pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.);
-              stab_SUPG_rho = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                  // Calculate density SUPG Stabilization Factor
+                  test = pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.);
+                  stab_SUPG_rho = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                }
+              else
+                {
+                  stab_SUPG_rho = 0.;
+                }
             
               Frho(ii) -= JxW_density[qp] * 
                           // Conservative Navier-Stokes
@@ -1129,9 +1173,19 @@ namespace GRINS
           libMesh::Number velocity_vec_length;
           libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
           velocity_vec_length = pow((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum), 1./2.);
-          unit_velocity(0) = u_momentum / velocity_vec_length;
-          unit_velocity(1) = v_momentum / velocity_vec_length;
-          unit_velocity(2) = w_momentum / velocity_vec_length;
+          
+          if (velocity_vec_length != 0.)
+            {
+              unit_velocity(0) = u_momentum / velocity_vec_length;
+              unit_velocity(1) = v_momentum / velocity_vec_length;
+              unit_velocity(2) = w_momentum / velocity_vec_length;
+            }
+          else
+            {
+              unit_velocity(0) = 0.;
+              unit_velocity(1) = 0.;
+              unit_velocity(2) = 0.;
+            }
           
             /* --- calculate viscosity tensor --- */
           libMesh::Real tau_11, tau_12, tau_13, tau_21, tau_22, tau_23, tau_31, tau_32, tau_33;
@@ -1603,11 +1657,25 @@ namespace GRINS
               momentum_dphi(0) = momentum_gradphi[ii][qp](0);
               momentum_dphi(1) = momentum_gradphi[ii][qp](1);
               momentum_dphi(2) = momentum_gradphi[ii][qp](2);
+
+              test = 0.;
+
+              if (abs(unit_velocity.dot(momentum_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(momentum_dphi)));
               
-              hvel_qp = 2./(abs(unit_velocity.dot(momentum_dphi)));
+                  // Calculate density SUPG Stabilization Factor
+                  test = pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.);
+                  stab_SUPG_momentum = (pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                }
+              else
+                {
+                  stab_SUPG_momentum = 0.;
+                }
               
-              // Calculate SUPG Momentum Stabilization Factor
-              stab_SUPG_momentum = (pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_mu_qp)/(density*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              // --------------------------------------------------------
+              // NS_Stab_momentum may want to be in the above IF
+              // --------------------------------------------------------
               
               // Calculate U-Momentum Navier-Stokes Solution for Stabilization
               for (unsigned int jj=0; jj != 5; jj++)
@@ -1806,11 +1874,11 @@ namespace GRINS
                       );
                       
                   if(std::isnan((*Frho_w)(ii)))
-                    { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
-                      std::cout << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n";
-                      std::cout << "ii = " << ii << "\n";
-                      std::cout << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n";
-                      std::cout << " -----------------------" << "\n";
+                    { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n"
+                                << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n"
+                                << "ii = " << ii << "\n"
+                                << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n"
+                                << " -----------------------" << "\n";
                     }                
                 }  // End of 3D if statment 
                 
@@ -1946,11 +2014,25 @@ namespace GRINS
               energy_dphi(0) = conserv_energy_gradphi[ii][qp](0);
               energy_dphi(1) = conserv_energy_gradphi[ii][qp](1);
               energy_dphi(2) = conserv_energy_gradphi[ii][qp](2);
+
+              test = 0.;
+
+              if (abs(unit_velocity.dot(energy_dphi)) != 0.)
+                {         
+                  hvel_qp = 2./(abs(unit_velocity.dot(energy_dphi)));
               
-              hvel_qp = 2./(abs(unit_velocity.dot(energy_dphi)));
+                  // Calculate density SUPG Stabilization Factor
+                  test = pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.);
+                  stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+                }
+              else
+                {
+                  stab_SUPG_energy = 0.;
+                }
               
-              // Calculate SUPG Momentum Stabilization Factor
-              stab_SUPG_energy = pow(pow(2./dtime, 2.) + pow((2.*(velocity_vec_length + a_qp))/hvel_qp, 2.) + pow((4.*_k_qp)/(density*_cp_qp*pow(hvel_qp, 2.)), 2.), -1./2.);      // NOTE: assumes dtime = 1. [Steady-State]
+              // --------------------------------------------------------
+              // NS_Stab_momentum may want to be in the above IF
+              // --------------------------------------------------------
               
               // Calculate Conservative Energy Navier-Stokes Solution for Stabilization
               for (unsigned int jj=0; jj != 5; jj++)
@@ -2028,11 +2110,11 @@ namespace GRINS
                     );    
                     
               if(std::isnan(Fconserv_energy(ii)))
-                { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
-                  std::cout << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n";
-                  std::cout << "ii = " << ii << "\n";
-                  std::cout << "JxW_energy[qp] = " << JxW_energy[qp] << "\n";
-                  std::cout << " -----------------------" << "\n";
+                { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n"
+                            << "Fconserv_energy(ii) = " << Fconserv_energy(ii) << "\n"
+                            << "ii = " << ii << "\n"
+                            << "JxW_energy[qp] = " << JxW_energy[qp] << "\n"
+                            << " -----------------------" << "\n";
                 }        
             }  // End of ii for energy degree of freedom
         }    // End of Quadrature Point For Loop
