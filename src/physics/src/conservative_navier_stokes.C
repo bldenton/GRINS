@@ -868,7 +868,7 @@ namespace GRINS
                           // SUPG Stabilization
                           + stab_SUPG_rho * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z));
               
-              /*if(std::isnan(Frho(ii)))
+              if(std::isnan(Frho(ii)))
                 { std::cout << "--- assemble_mass_time_derivative() ---" << "\n"
                             << "Frho(ii) = " << Frho(ii) << "\n"
                             << "ii = " << ii << "\n"
@@ -901,7 +901,7 @@ namespace GRINS
                             << " -----------------------" << "\n";
                             
                   std::cin.get();
-                }*/
+                }
               
               /* if (compute_jacobian)
               {
@@ -1751,7 +1751,7 @@ namespace GRINS
                     // Shock Capturing Operator -- IN Process
                     );
                     
-              /*if(std::isnan(Frho_u(ii)))
+              if(std::isnan(Frho_u(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Frho_u(ii) = " << Frho_u(ii) << "\n";
                   std::cout << "ii = " << ii << "\n";
@@ -1827,7 +1827,7 @@ namespace GRINS
                   std::cout << "a3_wrow(4) = " << a3_wrow(4) << "\n";
                   
                   std::cout << " -----------------------" << "\n";
-                }*/
+                }
               
               // F{rho_v}     
               Frho_v(ii) -= // Conservative Navier-Stokes
@@ -1844,7 +1844,7 @@ namespace GRINS
                     // Shock Capturing Operator -- IN Process
                     );
                     
-              /*if(std::isnan(Frho_v(ii)))
+              if(std::isnan(Frho_v(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Frho_v(ii) = " << Frho_v(ii) << "\n";
                   std::cout << "ii = " << ii << "\n";
@@ -1853,7 +1853,7 @@ namespace GRINS
                   std::cout << "a2_vrow.dot(dUdy) = " << a2_vrow.dot(dUdy) << "\n";
                   std::cout << "a3_vrow.dot(dUdz) = " << a3_vrow.dot(dUdz) << "\n";
                   std::cout << " -----------------------" << "\n";
-                }*/
+                }
                     
               if (this->_momentum_vars.dim() == 3)
                 {
@@ -1872,13 +1872,13 @@ namespace GRINS
                       // Shock Capturing Operator -- IN Process                      
                       );
                       
-                  /*if(std::isnan((*Frho_w)(ii)))
+                  if(std::isnan((*Frho_w)(ii)))
                     { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n"
                                 << "Frho_w(ii) = " << (*Frho_w)(ii) << "\n"
                                 << "ii = " << ii << "\n"
                                 << "JxW_momentum[qp] = " << JxW_momentum[qp] << "\n"
                                 << " -----------------------" << "\n";
-                    } */              
+                    }              
                 }  // End of 3D if statment 
                 
               /* if (compute_jacobian)
