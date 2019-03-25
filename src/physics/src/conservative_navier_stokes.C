@@ -536,7 +536,7 @@ namespace GRINS
                   stab_SUPG_rho = 0.;
                 }          
             
-              Frho(ii) -= //Conservative Navier-Stokes
+              Frho(ii) += //Conservative Navier-Stokes
                           JxW_density[qp] *
                           (rho_phi[ii][qp] * rho_dot)
                           //SUPG Stabilization
@@ -578,7 +578,7 @@ namespace GRINS
                   stab_SUPG_momentum = 0.;
                 }  
               
-              Frho_u(ii) -= // Conservative Navier-Stokes
+              Frho_u(ii) += // Conservative Navier-Stokes
                             JxW_momentum[qp] * 
                             (momentum_phi[ii][qp] * rho_u_dot)
                             // SUPG Stabilization
@@ -587,7 +587,7 @@ namespace GRINS
                              momentum_gradphi[ii][qp](1) * a2_urow.dot(dUdt) +
                              momentum_gradphi[ii][qp](2) * a3_urow.dot(dUdt));
                             
-              Frho_v(ii) -= // Conservative Navier-Stokes
+              Frho_v(ii) += // Conservative Navier-Stokes
                             JxW_momentum[qp] * 
                             (momentum_phi[ii][qp] * rho_v_dot)
                              // SUPG Stabilization
@@ -597,7 +597,7 @@ namespace GRINS
                              momentum_gradphi[ii][qp](2) * a3_vrow.dot(dUdt));
               
               if ( this -> _momentum_vars.dim() == 3)
-              (*Frho_w)(ii) -= // Conservative Navier-Stokes
+              (*Frho_w)(ii) += // Conservative Navier-Stokes
                                JxW_momentum[qp] * 
                                (momentum_phi[ii][qp] * rho_w_dot)
                                // SUPG Stabilization
@@ -662,7 +662,7 @@ namespace GRINS
                   stab_SUPG_energy = 0.;
                 }               
               
-              Fconserv_energy(ii) -= // Conservative Navier-Stokes
+              Fconserv_energy(ii) += // Conservative Navier-Stokes
                         JxW_energy[qp] * 
                         (conserv_energy_phi[ii][qp] * energy_dot)
                         // SUPG Stabilization
@@ -864,9 +864,9 @@ namespace GRINS
             
               Frho(ii) -= // Conservative Navier-Stokes
                           JxW_density[qp] * 
-                          (rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z))
+                          (rho_phi[ii][qp]*(grad_u_momentum_x + grad_v_momentum_y + grad_w_momentum_z)
                           // SUPG Stabilization
-                          + stab_SUPG_rho * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z);
+                          + stab_SUPG_rho * (rho_gradphi[ii][qp](0)*grad_u_momentum_x + rho_gradphi[ii][qp](1)*grad_v_momentum_y + rho_gradphi[ii][qp](2)*grad_w_momentum_z));
               
               /*if(std::isnan(Frho(ii)))
                 { std::cout << "--- assemble_mass_time_derivative() ---" << "\n"
@@ -1742,14 +1742,14 @@ namespace GRINS
                     (momentum_phi[ii][qp] * (a1_urow.dot(dUdx) + a2_urow.dot(dUdy) + a3_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](0) * (c11_urow.dot(dUdx) + c12_urow.dot(dUdy) + c13_urow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](1) * (c21_urow.dot(dUdx) + c22_urow.dot(dUdy) + c23_urow.dot(dUdz)) +
-                    momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz))) 
+                    momentum_gradphi[ii][qp](2) * (c31_urow.dot(dUdx) + c32_urow.dot(dUdy) + c33_urow.dot(dUdz)) 
                     // SUPG Stabilization
                     + stab_SUPG_momentum * 
                     ((momentum_gradphi[ii][qp](0) * a1_urow.dot(NS_stab_momentum)) +
                      (momentum_gradphi[ii][qp](1) * a2_urow.dot(NS_stab_momentum)) +
                      (momentum_gradphi[ii][qp](2) * a3_urow.dot(NS_stab_momentum)))
                     // Shock Capturing Operator -- IN Process
-                    ;
+                    );
                     
               /*if(std::isnan(Frho_u(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
@@ -1835,14 +1835,14 @@ namespace GRINS
                     (momentum_phi[ii][qp] * (a1_vrow.dot(dUdx) + a2_vrow.dot(dUdy) + a3_vrow.dot(dUdz)) + 
                     momentum_gradphi[ii][qp](0) * (c11_vrow.dot(dUdx) + c12_vrow.dot(dUdy) + c13_vrow.dot(dUdz)) +
                     momentum_gradphi[ii][qp](1) * (c21_vrow.dot(dUdx) + c22_vrow.dot(dUdy) + c23_vrow.dot(dUdz)) +
-                    momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz))) 
+                    momentum_gradphi[ii][qp](2) * (c31_vrow.dot(dUdx) + c32_vrow.dot(dUdy) + c33_vrow.dot(dUdz)) 
                     // SUPG Stabilization
                     + stab_SUPG_momentum * 
                     ((momentum_gradphi[ii][qp](0) * a1_vrow.dot(NS_stab_momentum)) +
                      (momentum_gradphi[ii][qp](1) * a2_vrow.dot(NS_stab_momentum)) +
                      (momentum_gradphi[ii][qp](2) * a3_vrow.dot(NS_stab_momentum)))
                     // Shock Capturing Operator -- IN Process
-                    ;
+                    );
                     
               /*if(std::isnan(Frho_v(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
@@ -1863,14 +1863,14 @@ namespace GRINS
                       (momentum_phi[ii][qp] * (a1_wrow.dot(dUdx) + a2_wrow.dot(dUdy) + a3_wrow.dot(dUdz)) + 
                       momentum_gradphi[ii][qp](0) * (c11_wrow.dot(dUdx) + c12_wrow.dot(dUdy) + c13_wrow.dot(dUdz)) +
                       momentum_gradphi[ii][qp](1) * (c21_wrow.dot(dUdx) + c22_wrow.dot(dUdy) + c23_wrow.dot(dUdz)) +
-                      momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz)))
+                      momentum_gradphi[ii][qp](2) * (c31_wrow.dot(dUdx) + c32_wrow.dot(dUdy) + c33_wrow.dot(dUdz))
                       // SUPG Stabilization
                       + stab_SUPG_momentum * 
                       ((momentum_gradphi[ii][qp](0) * a1_wrow.dot(NS_stab_momentum)) +
                        (momentum_gradphi[ii][qp](1) * a2_wrow.dot(NS_stab_momentum)) +
                        (momentum_gradphi[ii][qp](2) * a3_wrow.dot(NS_stab_momentum)))
                       // Shock Capturing Operator -- IN Process                      
-                      ;
+                      );
                       
                   /*if(std::isnan((*Frho_w)(ii)))
                     { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n"
@@ -2100,14 +2100,14 @@ namespace GRINS
                     (conserv_energy_phi[ii][qp] * (a1_energyrow.dot(dUdx) + a2_energyrow.dot(dUdy) + a3_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](0) * (c11_energyrow.dot(dUdx) + c12_energyrow.dot(dUdy) + c13_energyrow.dot(dUdz)) +
                     conserv_energy_gradphi[ii][qp](1) * (c21_energyrow.dot(dUdx) + c22_energyrow.dot(dUdy) + c23_energyrow.dot(dUdz)) +
-                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz)))
+                    conserv_energy_gradphi[ii][qp](2) * (c31_energyrow.dot(dUdx) + c32_energyrow.dot(dUdy) + c33_energyrow.dot(dUdz))
                     // SUPG Stabilization
                     + stab_SUPG_energy * 
                     ((conserv_energy_gradphi[ii][qp](0) * a1_energyrow.dot(NS_stab_energy)) +
                      (conserv_energy_gradphi[ii][qp](1) * a2_energyrow.dot(NS_stab_energy)) +
                      (conserv_energy_gradphi[ii][qp](2) * a3_energyrow.dot(NS_stab_energy)))
                     // Shock Capturing Operator -- IN Process  
-                    ;    
+                    );    
                     
               /*if(std::isnan(Fconserv_energy(ii)))
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n"
