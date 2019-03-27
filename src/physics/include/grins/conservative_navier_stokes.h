@@ -107,9 +107,12 @@ namespace GRINS
     
   protected:
     // Solution Variables
-    DensityFEVariable& _density_var;
-    ConservativeMomentumVariable& _momentum_vars;
-    ConservativeEnergyFEVariable& _conserv_energy_var;
+    //DensityFEVariable& _density_var;
+    //ConservativeMomentumVariable& _momentum_vars;
+    //ConservativeEnergyFEVariable& _conserv_energy_var;
+    ScalarVariable& _density_var;
+    VelocityVariable& _momentum_vars;
+    ScalarVariable& _conserv_energy_var;
   
     // Viscosity Object
     Viscosity _mu;
