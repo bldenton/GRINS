@@ -807,6 +807,13 @@ namespace GRINS
           sqr_v_momentum = v_momentum * v_momentum;
           sqr_w_momentum = w_momentum * w_momentum;
           velocity_vec_length = sqrt((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
+          
+          std::cout << "sqr_density = " << sqr_density << "\n"
+                    << "sqr_u_momentum = " << sqr_u_momentum << "\n"
+                    << "sqr_v_momentum = " << sqr_v_momentum << "\n"
+                    << "sqr_w_momentum = " << sqr_w_momentum << "\n"
+                    << "velocity_vec_length = " << velocity_vec_length << "\n";
+          std::cin.get();
 
           if (velocity_vec_length != 0.)
             {
