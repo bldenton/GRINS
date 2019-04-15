@@ -786,7 +786,16 @@ namespace GRINS
           v_momentum = context.interior_value(this->_momentum_vars.rho_v(), qp);
           if (this->_momentum_vars.dim() == 3)
             w_momentum = context.interior_value(this->_momentum_vars.rho_w(), qp);
-          conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);          
+          conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp); 
+          
+                    
+          std::cout << "---assemble_mass_time_derivative---" << "\n"
+                    << "density = " << density << "\n"
+                    << "u_momentum = " << u_momentum << "\n"
+                    << "v_momentum = " << v_momentum << "\n"
+                    << "w_momentum = " << w_momentum << "\n"
+                    << "conserv_energy = " << conserv_energy << "\n";
+          std::cin.get();     
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length, sqr_density, sqr_u_momentum, sqr_v_momentum, sqr_w_momentum;
@@ -1117,6 +1126,14 @@ namespace GRINS
             
             /* --- Conservative Energy Value at Quadrature Point --- */
           conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);
+          
+          std::cout << "---assemble_mass_time_derivative---" << "\n"
+                    << "density = " << density << "\n"
+                    << "u_momentum = " << u_momentum << "\n"
+                    << "v_momentum = " << v_momentum << "\n"
+                    << "w_momentum = " << w_momentum << "\n"
+                    << "conserv_energy = " << conserv_energy << "\n";
+          std::cin.get();
           
           // -----------------------------------------------------------
           // Compute the Solution Gradients at the Old Newton Iteration
