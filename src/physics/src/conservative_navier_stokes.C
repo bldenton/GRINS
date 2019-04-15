@@ -794,7 +794,9 @@ namespace GRINS
                     << "u_momentum = " << u_momentum << "\n"
                     << "v_momentum = " << v_momentum << "\n"
                     << "w_momentum = " << w_momentum << "\n"
-                    << "conserv_energy = " << conserv_energy << "\n";
+                    << "conserv_energy = " << conserv_energy << "\n"
+                    << "_cp_qp = " << _cp_qp << "\n"
+                    << "_gamma_qp = " << _gamma_qp << "\n";
           std::cin.get();     
           
             /* --- Calculate Velocity Vector  ---*/  
