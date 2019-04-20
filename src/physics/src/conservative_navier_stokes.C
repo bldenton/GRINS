@@ -1138,13 +1138,14 @@ namespace GRINS
             /* --- Conservative Energy Value at Quadrature Point --- */
           conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp);
           
-          std::cout << "---assemble_mass_time_derivative---" << "\n"
+          /*std::cout << "---assemble_mass_time_derivative---" << "\n"
                     << "density = " << density << "\n"
                     << "u_momentum = " << u_momentum << "\n"
                     << "v_momentum = " << v_momentum << "\n"
                     << "w_momentum = " << w_momentum << "\n"
                     << "conserv_energy = " << conserv_energy << "\n";
           std::cin.get();
+          */
           
           // -----------------------------------------------------------
           // Compute the Solution Gradients at the Old Newton Iteration
