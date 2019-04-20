@@ -789,7 +789,7 @@ namespace GRINS
           conserv_energy = context.interior_value(this->_conserv_energy_var.conserv_energy(), qp); 
           
                     
-          std::cout << "---assemble_mass_time_derivative---" << "\n"
+          /*std::cout << "---assemble_mass_time_derivative---" << "\n"
                     << "density = " << density << "\n"
                     << "u_momentum = " << u_momentum << "\n"
                     << "v_momentum = " << v_momentum << "\n"
@@ -797,7 +797,8 @@ namespace GRINS
                     << "conserv_energy = " << conserv_energy << "\n"
                     << "_cp_qp = " << _cp_qp << "\n"
                     << "_gamma_qp = " << _gamma_qp << "\n";
-          std::cin.get();     
+          std::cin.get();
+          */     
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length, sqr_density, sqr_u_momentum, sqr_v_momentum, sqr_w_momentum;
@@ -808,12 +809,13 @@ namespace GRINS
           sqr_w_momentum = w_momentum * w_momentum;
           velocity_vec_length = sqrt((1./sqr_density)*(sqr_u_momentum + sqr_v_momentum + sqr_w_momentum));
           
-          std::cout << "sqr_density = " << sqr_density << "\n"
+          /*std::cout << "sqr_density = " << sqr_density << "\n"
                     << "sqr_u_momentum = " << sqr_u_momentum << "\n"
                     << "sqr_v_momentum = " << sqr_v_momentum << "\n"
                     << "sqr_w_momentum = " << sqr_w_momentum << "\n"
                     << "velocity_vec_length = " << velocity_vec_length << "\n";
           std::cin.get();
+          */
 
           if (velocity_vec_length != 0.)
             {
