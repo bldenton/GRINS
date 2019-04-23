@@ -1196,7 +1196,7 @@ namespace GRINS
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = sqrt(_gamma_qp*_R_qp*T_qp);
           
-          std::cout << "---assemble_momentum_energy_time_derivative---" << "\n"
+          /*std::cout << "---assemble_momentum_energy_time_derivative---" << "\n"
                     << "density = " << density << "\n"
                     << "u_momentum = " << u_momentum << "\n"
                     << "v_momentum = " << v_momentum << "\n"
@@ -1208,7 +1208,7 @@ namespace GRINS
                     << "P_qp = " << P_qp << "\n"
                     << "a_qp = " << a_qp << "\n";
           std::cin.get();
-           
+          */ 
           
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length, test;
