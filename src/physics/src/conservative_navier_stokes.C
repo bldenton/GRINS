@@ -415,6 +415,13 @@ namespace GRINS
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = sqrt(_gamma_qp * _R_qp * T_qp);
           
+          if (T_qp < 0.0)
+            { std::cout << "--- mass_residual() ---" << "\n"
+                        << "ii = " << ii << "\n"
+                        << "T_qp = " << T_qp << "\n"
+                        << " -----------------------" << "\n";
+            }
+          
             /* --- Calculate Velocity Vector  ---*/  
           libMesh::Number velocity_vec_length;
           libMesh::DenseVector<libMesh::Number> velocity(3, 0.), unit_velocity(3, 0.);
