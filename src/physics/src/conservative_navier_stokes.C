@@ -411,7 +411,7 @@ namespace GRINS
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real T_qp = abs(_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = sqrt(_gamma_qp * _R_qp * T_qp);
           
@@ -837,7 +837,7 @@ namespace GRINS
             }
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real T_qp = abs(_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = sqrt(_gamma_qp*_R_qp*T_qp);
 
@@ -1198,7 +1198,7 @@ namespace GRINS
           libMesh::Real mu_R = 2.*_mu_qp + lambda;
           
             /* --- Calculate Temperature, Pressure and local speed of sound @ quadrature point --- */
-          libMesh::Real T_qp = (_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
+          libMesh::Real T_qp = abs(_gamma_qp/(density*_cp_qp)) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real P_qp = (_gamma_qp - 1.) * (conserv_energy - ((1./(2.*density)) * (sqr_u_momentum + sqr_v_momentum + sqr_w_momentum)));
           libMesh::Real a_qp = sqrt(_gamma_qp*_R_qp*T_qp);
           
