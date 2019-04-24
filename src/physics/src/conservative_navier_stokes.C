@@ -417,7 +417,6 @@ namespace GRINS
           
           if (T_qp < 0.0)
             { std::cout << "--- mass_residual() ---" << "\n"
-                        << "ii = " << ii << "\n"
                         << "T_qp = " << T_qp << "\n"
                         << " -----------------------" << "\n";
             }
