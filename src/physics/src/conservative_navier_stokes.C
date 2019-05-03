@@ -1774,9 +1774,9 @@ namespace GRINS
                   dphidz_dUdz(jj) = rho_gradphi[ii][qp](2) * dUdz(jj);
                 }
               
-              NS_stab_rho(0) = dUdx(1) + dUdy(2) + dUdz(3);
+              NS_stab_density(0) = dUdx(1) + dUdy(2) + dUdz(3);
                 
-              NS_stab_rho(1) = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
+              NS_stab_density(1) = a1_plus_b1_urow.dot(dUdx) + a2_plus_b2_urow.dot(dUdy) + a3_plus_b3_urow.dot(dUdz) 
                   - c11_urow.dot(dphidx_dUdx)
                   - c12_urow.dot(dphidx_dUdy)
                   - c13_urow.dot(dphidx_dUdz)
@@ -1787,7 +1787,7 @@ namespace GRINS
                   - c32_urow.dot(dphidz_dUdy)
                   - c33_urow.dot(dphidz_dUdz);
                             
-              NS_stab_rho(2) = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
+              NS_stab_density(2) = a1_plus_b1_vrow.dot(dUdx) + a2_plus_b2_vrow.dot(dUdy) + a3_plus_b3_vrow.dot(dUdz) 
                   - c11_vrow.dot(dphidx_dUdx)
                   - c12_vrow.dot(dphidx_dUdy)
                   - c13_vrow.dot(dphidx_dUdz)
@@ -1798,7 +1798,7 @@ namespace GRINS
                   - c32_vrow.dot(dphidz_dUdy)
                   - c33_vrow.dot(dphidz_dUdz);
 
-              NS_stab_rho(3) = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
+              NS_stab_density(3) = a1_plus_b1_wrow.dot(dUdx) + a2_plus_b2_wrow.dot(dUdy) + a3_plus_b3_wrow.dot(dUdz) 
                   - c11_wrow.dot(dphidx_dUdx)
                   - c12_wrow.dot(dphidx_dUdy)
                   - c13_wrow.dot(dphidx_dUdz)
@@ -1809,7 +1809,7 @@ namespace GRINS
                   - c32_wrow.dot(dphidz_dUdy)
                   - c33_wrow.dot(dphidz_dUdz);
               
-              NS_stab_rho(4) = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
+              NS_stab_density(4) = a1_plus_b1_energyrow.dot(dUdx) + a2_plus_b2_energyrow.dot(dUdy) + a3_plus_b3_energyrow.dot(dUdz) 
                   - c11_energyrow.dot(dphidx_dUdx)
                   - c12_energyrow.dot(dphidx_dUdy)
                   - c13_energyrow.dot(dphidx_dUdz)
