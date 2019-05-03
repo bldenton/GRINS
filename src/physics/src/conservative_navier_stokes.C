@@ -1735,7 +1735,7 @@ namespace GRINS
           // Loop over the density degrees of freedom
           // This computes the contributions of the continuity equation
           // ------------------------------------------------------------------
-          for (unsigned it ii = 0; ii != n_rho_dofs; ii++)
+          for (unsigned int ii = 0; ii != n_rho_dofs; ii++)
             {
               // Calculate Flow Aligned Length Scale
               rho_dphi(0) = rho_gradphi[ii][qp](0);
