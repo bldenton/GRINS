@@ -984,7 +984,7 @@ namespace GRINS
       // -----------------------------------------------------------------------
       // Element Jacobian * Quadrature weights for interior integration.
       // -----------------------------------------------------------------------
-      const std::vector<libMesh::Real> &JxW_rho = context.get_element_fe(this->_density_var.rho())->get_JxW();
+      const std::vector<libMesh::Real> &JxW_density = context.get_element_fe(this->_density_var.rho())->get_JxW();
       const std::vector<libMesh::Real> &JxW_momentum = context.get_element_fe(this->_momentum_vars.rho_u())->get_JxW();
       const std::vector<libMesh::Real> &JxW_energy = context.get_element_fe(this->_conserv_energy_var.conserv_energy())->get_JxW();
       
@@ -1827,9 +1827,9 @@ namespace GRINS
                           (rho_phi[ii][qp]*(dUdx(1) + dUdy(2) + dUdz(3))
                           // SUPG Stabilization
                           + stab_SUPG_rho * 
-                          ((rho_gradphi[ii][qp](0) * a1_rhorow.dot(NS_stab_rho)) +
-                           (rho_gradphi[ii][qp](1) * a2_rhorow.dot(NS_stab_rho)) +
-                           (rho_gradphi[ii][qp](2) * a3_rhorow.dot(NS_stab_rho)))
+                          ((rho_gradphi[ii][qp](0) * a1_rhorow.dot(NS_stab_density)) +
+                           (rho_gradphi[ii][qp](1) * a2_rhorow.dot(NS_stab_density)) +
+                           (rho_gradphi[ii][qp](2) * a3_rhorow.dot(NS_stab_density)))
                           // Shock Capturing Operator -- IN Process
                           );
                           
@@ -1837,10 +1837,10 @@ namespace GRINS
                 { std::cout << "--- assemble_momentum_energy_time_derivative() ---" << "\n";
                   std::cout << "Frho(ii) = " << Frho(ii) << "\n";
                   std::cout << "ii = " << ii << "\n";
-                  std::cout << "JxW_rho[qp] = " << JxW_momentum[qp] << "\n";
-                  std::cout << "a1_rhorow.dot(NS_stab_rho) = " << a1_rhorow.dot(NS_stab_rho) << "\n";
-                  std::cout << "a2_rhorow.dot(NS_stab_rho) = " << a2_rhorow.dot(NS_stab_rho) << "\n";
-                  std::cout << "a3_rhorow.dot(NS_stab_rho) = " << a3_rhorow.dot(NS_stab_rho) << "\n";
+                  std::cout << "JxW_density[qp] = " << JxW_density[qp] << "\n";
+                  std::cout << "a1_rhorow.dot(NS_stab_density) = " << a1_rhorow.dot(NS_stab_density) << "\n";
+                  std::cout << "a2_rhorow.dot(NS_stab_density) = " << a2_rhorow.dot(NS_stab_density) << "\n";
+                  std::cout << "a3_rhorow.dot(NS_stab_density) = " << a3_rhorow.dot(NS_stab_density) << "\n";
                   std::cout << "\n";
                   std::cout << "density = " << density << "\n";
                   std::cout << "\n";
